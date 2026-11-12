@@ -1,0 +1,50 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Footer from '../components/Footer.astro';
+import Header from '../components/Header.astro';
+---
+
+<BaseLayout
+  title="Privacy | Prof. Percival"
+  description="How the Prof. Percival portfolio handles contact messages and anonymous visitor statistics."
+>
+  <Header />
+  <main id="main" class="legal-page shell">
+    <p class="eyebrow">Privacy</p>
+    <h1>Clear about what this site collects.</h1>
+
+    <div class="legal-page__body">
+      <section aria-labelledby="analytics-title">
+        <h2 id="analytics-title">Anonymous visitor statistics</h2>
+        <p>
+          This site uses GoatCounter to understand which pages are useful, where visits come from, and whether visitors
+          open projects or the CV. GoatCounter is configured without analytics cookies and is disabled for local
+          previews.
+        </p>
+        <p>The site never sends contact-form values, email addresses, or message content to analytics.</p>
+      </section>
+
+      <section aria-labelledby="contact-privacy-title">
+        <h2 id="contact-privacy-title">Contact messages</h2>
+        <p>
+          The contact form uses Formspree to deliver your name, email address, subject, and message to the site owner.
+          Formspree processes and stores the submission under its own privacy terms. Do not send passwords, financial
+          information, or other sensitive data through the form.
+        </p>
+      </section>
+
+      <section aria-labelledby="choices-title">
+        <h2 id="choices-title">Your choices</h2>
+        <p>
+          Browser privacy tools may block analytics without affecting the rest of the site. You can contact the owner
+          through LinkedIn instead of using the form.
+        </p>
+      </section>
+    </div>
+
+    <a class="text-link" href="/">
+      Return home <span aria-hidden="true">↗</span>
+    </a>
+  </main>
+  <Footer />
+</BaseLayout>

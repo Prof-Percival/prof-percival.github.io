@@ -1,16 +1,78 @@
 ---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Footer from '../components/Footer.astro';
+import Header from '../components/Header.astro';
+import SystemsMap from '../components/SystemsMap.astro';
+import { site } from '../data/site';
 ---
 
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="icon" href="/favicon.ico" />
-    <meta name="viewport" content="width=device-width" />
-    <meta name="generator" content={Astro.generator} />
-    <title>Astro</title>
-  </head>
-  <body>
-    <h1>Astro</h1>
-  </body>
-</html>
+<BaseLayout>
+  <Header />
+  <main id="main">
+    <section class="hero shell" id="top" aria-labelledby="hero-title">
+      <div class="hero__copy">
+        <p class="eyebrow">
+          <span class="status-dot" aria-hidden="true"></span> Software Engineer: Back-End · Cape Town
+        </p>
+        <h1 id="hero-title">I build dependable systems for the moments that matter.</h1>
+        <p class="hero__intro">
+          Back-end engineering across financial products, cloud infrastructure, and data-intensive services. Currently
+          building credit systems at Capitec Bank. Previously Amazon EC2 and OLX.
+        </p>
+        <div class="hero__actions">
+          <a class="button button--primary" href="#work">
+            Explore my work <span aria-hidden="true">↓</span>
+          </a>
+          <a class="text-link" href="#contact">
+            Start a conversation <span aria-hidden="true">↗</span>
+          </a>
+        </div>
+        <dl class="hero__facts">
+          <div>
+            <dt>Based in</dt>
+            <dd>{site.location}</dd>
+          </div>
+          <div>
+            <dt>Focus</dt>
+            <dd>Back-end · Cloud · Data</dd>
+          </div>
+        </dl>
+      </div>
+      <SystemsMap />
+    </section>
+
+    <section class="proof-strip" aria-label="Career highlights">
+      <div class="shell proof-strip__inner">
+        <span>Current</span>
+        <strong>Capitec Bank</strong>
+        <span>Previously</span>
+        <strong>Amazon EC2</strong>
+        <strong>OLX</strong>
+        <span>5+ years across software and technical education</span>
+      </div>
+    </section>
+
+    <section class="section shell placeholder-section" id="work" aria-labelledby="work-title">
+      <p class="eyebrow">01 / Selected work</p>
+      <h2 id="work-title">Systems with a reason behind every decision.</h2>
+      <p>Missing Children SA and the earlier-work collection are being prepared for the next build checkpoint.</p>
+    </section>
+
+    <section class="section shell placeholder-section" id="experience" aria-labelledby="experience-title">
+      <p class="eyebrow">02 / Experience</p>
+      <h2 id="experience-title">From product delivery to infrastructure at scale.</h2>
+    </section>
+
+    <section class="section shell placeholder-section" id="about" aria-labelledby="about-title">
+      <p class="eyebrow">03 / About</p>
+      <h2 id="about-title">An engineer who follows the problem through.</h2>
+    </section>
+
+    <section class="section shell placeholder-section" id="contact" aria-labelledby="contact-title">
+      <p class="eyebrow">04 / Contact</p>
+      <h2 id="contact-title">Good systems start with a clear conversation.</h2>
+      <p>The full contact experience arrives with the dedicated Formspree integration checkpoint.</p>
+    </section>
+  </main>
+  <Footer />
+</BaseLayout>
