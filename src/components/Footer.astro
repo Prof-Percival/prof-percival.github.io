@@ -1,0 +1,33 @@
+---
+import { site } from '../data/site';
+import ThemeToggle from './ThemeToggle.astro';
+---
+
+<footer class="site-footer">
+  <div class="shell site-footer__inner">
+    <div>
+      <span class="brand__mark brand__mark--footer" aria-hidden="true">
+        PM
+      </span>
+      <p>Built with care in Cape Town.</p>
+    </div>
+    <nav aria-label="Footer navigation">
+      <a href={site.links.github}>
+        GitHub <span aria-hidden="true">↗</span>
+      </a>
+      <a href={site.links.linkedin}>
+        LinkedIn <span aria-hidden="true">↗</span>
+      </a>
+      <a href={site.links.resume}>
+        CV <span aria-hidden="true">↗</span>
+      </a>
+      <a href="/privacy/">Privacy</a>
+    </nav>
+    <div class="site-footer__meta">
+      <ThemeToggle />
+      <small>
+        © {new Date().getFullYear()} {site.name}
+      </small>
+    </div>
+  </div>
+</footer>

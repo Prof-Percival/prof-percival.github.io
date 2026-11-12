@@ -1,0 +1,45 @@
+---
+import ThemeToggle from './ThemeToggle.astro';
+---
+
+<header class="site-header" data-site-header>
+  <div class="shell site-header__inner">
+    <a class="brand" href="#top">
+      <span class="brand__mark" aria-hidden="true">
+        PM
+      </span>
+      <span class="brand__text">
+        <strong>Prof. Percival</strong>
+        <small>Back-end engineer</small>
+      </span>
+      <span class="sr-only">, home</span>
+    </a>
+
+    <nav class="site-nav" aria-label="Main navigation">
+      <a href="#work">Work</a>
+      <a href="#experience">Experience</a>
+      <a href="#about">About</a>
+      <a href="#contact">Contact</a>
+    </nav>
+
+    <details class="mobile-menu">
+      <summary aria-label="Open navigation">
+        <span aria-hidden="true"></span>
+        <span aria-hidden="true"></span>
+      </summary>
+      <nav aria-label="Mobile navigation">
+        <a href="#work">Work</a>
+        <a href="#experience">Experience</a>
+        <a href="#about">About</a>
+        <a href="#contact">Contact</a>
+      </nav>
+    </details>
+
+    <div class="site-header__actions">
+      <ThemeToggle />
+      <a class="header-resume" href="/resume/percival-maredi-cv.pdf">
+        CV <span aria-hidden="true">↗</span>
+      </a>
+    </div>
+  </div>
+</header>

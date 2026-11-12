@@ -1,0 +1,102 @@
+---
+const nodes = [
+  { id: 'client', label: 'Client', detail: 'Clear journeys start with the person using the system.', x: 14, y: 52 },
+  {
+    id: 'api',
+    label: 'API',
+    detail: 'Stable contracts turn complex workflows into reusable capabilities.',
+    x: 32,
+    y: 20,
+  },
+  {
+    id: 'rules',
+    label: 'Rules',
+    detail: 'Explicit domain decisions keep behavior explainable and testable.',
+    x: 67,
+    y: 20,
+  },
+  { id: 'data', label: 'Data', detail: 'Purposeful models and queries keep the critical path fast.', x: 86, y: 52 },
+  {
+    id: 'cloud',
+    label: 'Cloud',
+    detail: 'Automation makes infrastructure repeatable, observable, and safe.',
+    x: 67,
+    y: 76,
+  },
+  { id: 'delivery', label: 'Delivery', detail: 'Tests and deployment guardrails make change routine.', x: 32, y: 76 },
+];
+---
+
+<figure class="systems-map" data-systems-map aria-labelledby="systems-map-title">
+  <figcaption class="systems-map__caption">
+    <span class="eyebrow">How I think about systems</span>
+    <strong id="systems-map-title">Trace the request, then improve the whole path.</strong>
+  </figcaption>
+
+  <div class="systems-map__stage">
+    <svg
+      class="systems-map__lines"
+      viewBox="0 0 600 520"
+      role="img"
+      aria-label="A request path connecting client, API, rules, data, cloud, and delivery"
+    >
+      <defs>
+        <linearGradient id="trace-gradient" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="var(--signal)" />
+          <stop offset="1" stop-color="var(--accent)" />
+        </linearGradient>
+      </defs>
+      <path class="systems-map__base" d="M80 260 190 105 410 105 520 260 410 415 190 415Z"></path>
+      <path class="systems-map__trace" d="M80 260 190 105 410 105 520 260 410 415 190 415 80 260"></path>
+      <path
+        class="systems-map__spoke"
+        d="M300 260 80 260M300 260 190 105M300 260 410 105M300 260 520 260M300 260 410 415M300 260 190 415"
+      ></path>
+      <circle class="systems-map__orbit" cx="300" cy="260" r="94"></circle>
+    </svg>
+
+    <div class="systems-map__center" aria-hidden="true">
+      <span>PM</span>
+      <small>Systems</small>
+    </div>
+
+    {nodes.map((node, index) => (
+      <button
+        class="systems-map__node"
+        type="button"
+        style={`--node-x:${node.x}%;--node-y:${node.y}%;--node-index:${index}`}
+        data-map-node
+        data-detail={node.detail}
+        aria-describedby="systems-map-detail"
+      >
+        <span>{String(index + 1).padStart(2, '0')}</span>
+        {node.label}
+      </button>
+    ))}
+
+    <p class="systems-map__detail" id="systems-map-detail" aria-live="polite">
+      Select a node to inspect the system.
+    </p>
+  </div>
+</figure>
+
+<script>
+  const maps = document.querySelectorAll<HTMLElement>('[data-systems-map]');
+
+  maps.forEach((map) => {
+    const detail = map.querySelector<HTMLElement>('.systems-map__detail');
+    const nodes = map.querySelectorAll<HTMLButtonElement>('[data-map-node]');
+
+    const select = (node: HTMLButtonElement) => {
+      nodes.forEach((item) => item.removeAttribute('data-active'));
+      node.setAttribute('data-active', '');
+      if (detail) detail.textContent = node.dataset.detail ?? '';
+    };
+
+    nodes.forEach((node) => {
+      node.addEventListener('mouseenter', () => select(node));
+      node.addEventListener('focus', () => select(node));
+      node.addEventListener('click', () => select(node));
+    });
+  });
+</script>
