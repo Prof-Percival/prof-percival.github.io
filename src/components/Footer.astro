@@ -1,5 +1,6 @@
 ---
 import { site } from '../data/site';
+import ArrowIcon from './ArrowIcon.astro';
 import ThemeToggle from './ThemeToggle.astro';
 ---
 
@@ -13,13 +14,13 @@ import ThemeToggle from './ThemeToggle.astro';
     </div>
     <nav aria-label="Footer navigation">
       <a href={site.links.github}>
-        GitHub <span aria-hidden="true">↗</span>
+        GitHub <ArrowIcon />
       </a>
       <a href={site.links.linkedin}>
-        LinkedIn <span aria-hidden="true">↗</span>
+        LinkedIn <ArrowIcon />
       </a>
       <a href={site.links.resume}>
-        CV <span aria-hidden="true">↗</span>
+        CV <ArrowIcon />
       </a>
       <a href="/privacy/">Privacy</a>
     </nav>

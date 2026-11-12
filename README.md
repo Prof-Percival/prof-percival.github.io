@@ -1,6 +1,6 @@
 # Prof. Percival portfolio
 
-Source for [prof-percival.github.io](https://prof-percival.github.io), the portfolio of Phadima Percival Maredi.
+Source for [prof-percival.github.io](https://prof-percival.github.io), the software engineering portfolio of Phadima Percival Maredi.
 
 ## Development
 

@@ -1,0 +1,29 @@
+---
+import { capabilityGroups } from '../data/portfolio';
+import SectionHeading from './SectionHeading.astro';
+---
+
+<section class="section capabilities-section shell" aria-labelledby="capabilities-title">
+  <SectionHeading
+    number="04"
+    eyebrow="Capabilities"
+    id="capabilities-title"
+    title="Tools grouped by what they help me deliver."
+    introduction="Technology changes. The useful part is knowing which boundary, model, or feedback loop needs to become clearer."
+  />
+
+  <div class="capability-grid">
+    {capabilityGroups.map((group) => (
+      <article class="capability-card">
+        <span>{group.number}</span>
+        <h3>{group.title}</h3>
+        <p>{group.summary}</p>
+        <ul>
+          {group.skills.map((skill) => (
+            <li>{skill}</li>
+          ))}
+        </ul>
+      </article>
+    ))}
+  </div>
+</section>
