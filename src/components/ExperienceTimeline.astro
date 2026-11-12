@@ -1,0 +1,49 @@
+---
+import { experience } from '../data/portfolio';
+import SectionHeading from './SectionHeading.astro';
+---
+
+<section class="section experience-section" id="experience" aria-labelledby="experience-title">
+  <div class="shell">
+    <SectionHeading
+      number="03"
+      eyebrow="Experience"
+      id="experience-title"
+      title="Full-stack range. Back-end depth."
+      introduction="I work across the product, then go deep where contracts, data, reliability, and operations carry the most weight."
+    />
+
+    <div class="timeline">
+      {experience.map((item, index) => (
+        <article class="timeline-entry">
+          <div class="timeline-entry__date">
+            <span>{String(index + 1).padStart(2, '0')}</span>
+            <time>{item.period}</time>
+            <i class:list={{ current: item.current }} aria-hidden="true"></i>
+          </div>
+          <div class="timeline-entry__identity">
+            <h3>{item.company}</h3>
+            <p>{item.role}</p>
+            <small>{item.location}</small>
+          </div>
+          <div class="timeline-entry__story">
+            <p>{item.summary}</p>
+            <details open={index < 2}>
+              <summary>{index < 2 ? 'Role details' : 'Read role details'}</summary>
+              <ul>
+                {item.highlights.map((highlight) => (
+                  <li>{highlight}</li>
+                ))}
+              </ul>
+              <ul class="tag-list" aria-label={`${item.company} technologies`}>
+                {item.stack.map((technology) => (
+                  <li>{technology}</li>
+                ))}
+              </ul>
+            </details>
+          </div>
+        </article>
+      ))}
+    </div>
+  </div>
+</section>

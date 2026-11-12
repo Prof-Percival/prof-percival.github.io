@@ -1,0 +1,61 @@
+---
+import type { ImageMetadata } from 'astro';
+import { Image } from 'astro:assets';
+
+import contactsImage from '../assets/projects/contacts-management.png';
+import crsImage from '../assets/projects/crs-rentals.png';
+import matrixImage from '../assets/projects/matrix-multiplication.webp';
+import mmeaImage from '../assets/projects/mmea.png';
+import sicImage from '../assets/projects/sic-data-analysis.jpg';
+import { earlierProjects, type EarlierProject } from '../data/portfolio';
+import SectionHeading from './SectionHeading.astro';
+
+const images: Record<EarlierProject['id'], ImageMetadata> = {
+  sic: sicImage,
+  mmea: mmeaImage,
+  crs: crsImage,
+  contacts: contactsImage,
+  matrix: matrixImage,
+};
+---
+
+<section class="section earlier-work shell" aria-labelledby="earlier-work-title">
+  <SectionHeading
+    number="02"
+    eyebrow="Earlier work"
+    id="earlier-work-title"
+    title="Range built one project at a time."
+    introduction="Five earlier projects that shaped how I think about users, data, interfaces, and the layers beneath them."
+  />
+
+  <div class="project-grid">
+    {earlierProjects.map((project, index) => (
+      <article class:list={['project-card', index === 0 && 'project-card--wide']}>
+        <div class="project-card__image">
+          <Image
+            src={images[project.id]}
+            alt={project.alt}
+            widths={[320, 480, 720]}
+            sizes={index === 0 ? '(min-width: 760px) 54vw, 100vw' : '(min-width: 760px) 28vw, 100vw'}
+            format="webp"
+            loading="lazy"
+            quality={82}
+          />
+          <span>{String(index + 1).padStart(2, '0')}</span>
+        </div>
+        <div class="project-card__body">
+          <div class="project-card__title">
+            <h3>{project.title}</h3>
+            <span>{project.period}</span>
+          </div>
+          <p>{project.summary}</p>
+          <ul class="tag-list" aria-label={`${project.title} technologies`}>
+            {project.stack.map((item) => (
+              <li>{item}</li>
+            ))}
+          </ul>
+        </div>
+      </article>
+    ))}
+  </div>
+</section>

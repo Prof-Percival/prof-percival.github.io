@@ -1,0 +1,34 @@
+---
+import { missingChildrenCaseStudy as project } from '../data/portfolio';
+import ArrowIcon from './ArrowIcon.astro';
+import MissingChildrenVisual from './MissingChildrenVisual.astro';
+import SectionHeading from './SectionHeading.astro';
+---
+
+<section class="section work-section shell" id="work" aria-labelledby="work-title">
+  <SectionHeading
+    number="01"
+    eyebrow="Selected work"
+    id="work-title"
+    title="Systems with a reason behind every decision."
+    introduction="A closer look at work where product needs, service boundaries, data, and the people operating the system all matter."
+  />
+
+  <article class="featured-project">
+    <div class="featured-project__copy">
+      <p class="project-index">01 / {project.eyebrow}</p>
+      <h3>{project.title}</h3>
+      <p class="featured-project__lead">{project.summary}</p>
+      <p>{project.contribution}</p>
+      <ul class="tag-list" aria-label="Missing Children SA technologies">
+        {project.stack.slice(0, 6).map((item) => (
+          <li>{item}</li>
+        ))}
+      </ul>
+      <a class="text-link" href={`/work/${project.slug}/`}>
+        Read the case study <ArrowIcon />
+      </a>
+    </div>
+    <MissingChildrenVisual />
+  </article>
+</section>

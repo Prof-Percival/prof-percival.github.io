@@ -1,0 +1,46 @@
+---
+import { education } from '../data/portfolio';
+import ArrowIcon from './ArrowIcon.astro';
+import SectionHeading from './SectionHeading.astro';
+---
+
+<section class="section about-section shell" id="about" aria-labelledby="about-title">
+  <SectionHeading number="05" eyebrow="About" id="about-title" title="An engineer who follows the problem through." />
+
+  <div class="about-grid">
+    <div class="about-copy">
+      <p class="about-copy__lead">
+        I am a software engineer with full-stack experience, strong back-end depth, and a foundation in data analysis. I
+        enjoy the point where a product idea becomes an interface, a contract, a data model, a release, and something a
+        real person can rely on.
+      </p>
+      <p>
+        I do my best work in collaborative teams that care about code quality, transparent decisions, and sustainable
+        operations. I like owning a problem end to end, using automation to remove repeat work, and sharing what I learn
+        so the whole team moves faster.
+      </p>
+      <p>
+        My work has moved through web, desktop, and mobile products into cloud fleet automation and financial systems.
+        Teaching programming sharpened the way I communicate technical decisions. If an idea cannot be explained
+        clearly, it probably needs another pass.
+      </p>
+      <a class="text-link" href="/resume/percival-maredi-cv.pdf">
+        Download my CV <ArrowIcon />
+      </a>
+    </div>
+
+    <div class="education-list">
+      <p class="eyebrow">Education</p>
+      {education.map((item, index) => (
+        <article>
+          <span>{String(index + 1).padStart(2, '0')}</span>
+          <div>
+            <h3>{item.qualification}</h3>
+            <p>{item.institution}</p>
+          </div>
+          <time>{item.period}</time>
+        </article>
+      ))}
+    </div>
+  </div>
+</section>

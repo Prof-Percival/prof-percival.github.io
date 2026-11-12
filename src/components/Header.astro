@@ -1,5 +1,6 @@
 ---
 import ThemeToggle from './ThemeToggle.astro';
+import ArrowIcon from './ArrowIcon.astro';
 ---
 
 <header class="site-header" data-site-header>
@@ -10,7 +11,7 @@ import ThemeToggle from './ThemeToggle.astro';
       </span>
       <span class="brand__text">
         <strong>Prof. Percival</strong>
-        <small>Back-end engineer</small>
+        <small>Software engineer</small>
       </span>
       <span class="sr-only">, home</span>
     </a>
@@ -38,7 +39,7 @@ import ThemeToggle from './ThemeToggle.astro';
     <div class="site-header__actions">
       <ThemeToggle />
       <a class="header-resume" href="/resume/percival-maredi-cv.pdf">
-        CV <span aria-hidden="true">↗</span>
+        CV <ArrowIcon />
       </a>
     </div>
   </div>
