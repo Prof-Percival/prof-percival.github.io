@@ -81,6 +81,24 @@ test.describe('home page', () => {
     expect(visual!.height / frame!.height).toBeGreaterThan(0.85);
   });
 
+  test('keeps every project image inside its mobile media frame', async ({ page, isMobile }) => {
+    test.skip(!isMobile, 'This regression covers the narrow project-card layout.');
+
+    for (const title of ['MMEA', 'CRS Rentals', 'Contacts Management', 'Matrix Multiplication']) {
+      const card = page.getByRole('article').filter({ has: page.getByRole('heading', { name: title, exact: true }) });
+      const image = card.locator('img');
+      await card.scrollIntoViewIfNeeded();
+      await image.evaluate((element: HTMLImageElement) => element.decode());
+
+      const frameBox = await card.locator('.project-card__image').boundingBox();
+      const imageBox = await image.boundingBox();
+      expect(frameBox).not.toBeNull();
+      expect(imageBox).not.toBeNull();
+      expect(imageBox!.y).toBeGreaterThanOrEqual(frameBox!.y);
+      expect(imageBox!.y + imageBox!.height).toBeLessThanOrEqual(frameBox!.y + frameBox!.height);
+    }
+  });
+
   test('uses the general software-engineer identity while preserving the exact current role', async ({ page }) => {
     await expect(page.getByText('Software Engineer: Back-End', { exact: true })).toBeVisible();
     await expect(page.getByText('Software Development Engineer, EC2', { exact: true })).toBeVisible();
