@@ -1,0 +1,68 @@
+---
+import { certifications, community, languages } from '../data/portfolio';
+import { site } from '../data/site';
+import ArrowIcon from './ArrowIcon.astro';
+---
+
+<div class="profile-details">
+  <section class="credentials" aria-labelledby="credentials-title">
+    <div class="profile-subheading">
+      <p class="eyebrow">Selected credentials</p>
+      <div>
+        <h3 id="credentials-title">Evidence of continuous learning.</h3>
+        <p>A focused selection from more than 100 completed credentials.</p>
+      </div>
+    </div>
+    <div class="credential-grid">
+      {certifications.map((credential, index) => (
+        <a href={credential.url} target="_blank" rel="noopener noreferrer" data-track="credential-open">
+          <span>{String(index + 1).padStart(2, '0')}</span>
+          <div>
+            <strong>{credential.title}</strong>
+            <small>
+              {credential.issuer} · {credential.issued}
+            </small>
+          </div>
+          <ArrowIcon />
+        </a>
+      ))}
+    </div>
+    <a class="text-link credentials__all" href={site.links.linkedin} data-track="linkedin-credentials">
+      View the complete credential list on LinkedIn <ArrowIcon />
+    </a>
+  </section>
+
+  <div class="profile-details__secondary">
+    <section class="language-section" aria-labelledby="languages-title">
+      <div class="profile-subheading">
+        <p class="eyebrow">Languages</p>
+        <h3 id="languages-title">Able to work across more than one language and context.</h3>
+      </div>
+      <dl class="language-list">
+        {languages.map((language) => (
+          <div>
+            <dt>{language.name}</dt>
+            <dd>{language.proficiency}</dd>
+          </div>
+        ))}
+      </dl>
+    </section>
+
+    <section class="community-section" aria-labelledby="community-title">
+      <div class="profile-subheading">
+        <p class="eyebrow">Early experience and community</p>
+        <h3 id="community-title">Learning by helping other people move forward.</h3>
+      </div>
+      <div class="community-list">
+        {community.map((item) => (
+          <article>
+            <span>{item.period}</span>
+            <h4>{item.role}</h4>
+            <p>{item.organization}</p>
+            <small>{item.summary}</small>
+          </article>
+        ))}
+      </div>
+    </section>
+  </div>
+</div>

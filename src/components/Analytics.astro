@@ -1,0 +1,36 @@
+---
+const endpoint = import.meta.env.PUBLIC_GOATCOUNTER_ENDPOINT?.trim() ?? '';
+---
+
+<script is:inline define:vars={{ endpoint }}>
+  (() => {
+    if (!endpoint || location.hostname !== 'prof-percival.github.io') return;
+
+    let analyticsUrl;
+    try {
+      analyticsUrl = new URL(endpoint);
+    } catch {
+      return;
+    }
+    if (analyticsUrl.protocol !== 'https:' || !analyticsUrl.hostname.endsWith('.goatcounter.com')) return;
+
+    const script = document.createElement('script');
+    script.async = true;
+    script.src = 'https://gc.zgo.at/count.js';
+    script.dataset.goatcounter = analyticsUrl.href;
+    document.head.append(script);
+
+    const track = (path, title = path) => {
+      if (!window.goatcounter?.count) return;
+      window.goatcounter.count({ path, title, event: true });
+    };
+
+    document.addEventListener('click', (event) => {
+      const target = event.target instanceof Element ? event.target.closest('[data-track]') : null;
+      if (target instanceof HTMLElement && target.dataset.track) track(target.dataset.track, target.innerText.trim());
+    });
+    document.addEventListener('portfolio:track', (event) => {
+      if (event instanceof CustomEvent && typeof event.detail?.path === 'string') track(event.detail.path);
+    });
+  })();
+</script>

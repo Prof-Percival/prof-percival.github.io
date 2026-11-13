@@ -31,6 +31,7 @@
       const next = document.documentElement.dataset.theme === 'light' ? 'dark' : 'light';
       document.documentElement.dataset.theme = next;
       document.documentElement.style.colorScheme = next;
+      document.querySelector('[data-theme-color]')?.setAttribute('content', next === 'light' ? '#f4f0e8' : '#090d12');
       localStorage.setItem('portfolio-theme', next);
       updateToggles(next);
     });

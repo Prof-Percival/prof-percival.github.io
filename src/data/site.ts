@@ -1,6 +1,6 @@
 export const site = {
   name: 'Phadima Percival Maredi',
-  onlineName: 'Prof. Percival',
+  githubName: 'Prof-Percival',
   initials: 'PM',
   currentRole: 'Software Engineer: Back-End',
   currentCompany: 'Capitec Bank',
@@ -11,7 +11,7 @@ export const site = {
     'Software engineer building dependable products across back-end services, cloud infrastructure, data, and modern web experiences.',
   links: {
     github: 'https://github.com/Prof-Percival',
-    linkedin: 'https://www.linkedin.com/in/prof-percival',
+    linkedin: 'https://za.linkedin.com/in/prof-percival',
     resume: '/resume/percival-maredi-cv.pdf',
   },
   contact: {

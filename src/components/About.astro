@@ -1,6 +1,7 @@
 ---
 import { education } from '../data/portfolio';
 import ArrowIcon from './ArrowIcon.astro';
+import ProfileDetails from './ProfileDetails.astro';
 import SectionHeading from './SectionHeading.astro';
 ---
 
@@ -24,7 +25,7 @@ import SectionHeading from './SectionHeading.astro';
         Teaching programming sharpened the way I communicate technical decisions. If an idea cannot be explained
         clearly, it probably needs another pass.
       </p>
-      <a class="text-link" href="/resume/percival-maredi-cv.pdf">
+      <a class="text-link" href="/resume/percival-maredi-cv.pdf" data-track="cv-about">
         Download my CV <ArrowIcon />
       </a>
     </div>
@@ -37,10 +38,13 @@ import SectionHeading from './SectionHeading.astro';
           <div>
             <h3>{item.qualification}</h3>
             <p>{item.institution}</p>
+            {'detail' in item && <small>{item.detail}</small>}
           </div>
           <time>{item.period}</time>
         </article>
       ))}
     </div>
   </div>
+
+  <ProfileDetails />
 </section>
