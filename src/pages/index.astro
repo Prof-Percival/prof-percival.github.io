@@ -1,72 +1,57 @@
 ---
-import BaseLayout from '../layouts/BaseLayout.astro';
-import About from '../components/About.astro';
+import AppShell from '../components/AppShell.astro';
 import ArrowIcon from '../components/ArrowIcon.astro';
-import Capabilities from '../components/Capabilities.astro';
-import ContactForm from '../components/ContactForm.astro';
-import EarlierWork from '../components/EarlierWork.astro';
-import ExperienceTimeline from '../components/ExperienceTimeline.astro';
-import Footer from '../components/Footer.astro';
-import Header from '../components/Header.astro';
-import SelectedWork from '../components/SelectedWork.astro';
+import HubRoutes from '../components/HubRoutes.astro';
 import SystemsMap from '../components/SystemsMap.astro';
 import { site } from '../data/site';
+import BaseLayout from '../layouts/BaseLayout.astro';
 ---
 
 <BaseLayout>
-  <Header />
-  <main id="main">
-    <section class="hero shell" id="top" aria-labelledby="hero-title">
-      <div class="hero__copy">
-        <p class="eyebrow">
-          <span class="status-dot" aria-hidden="true"></span> Software Engineer · Cape Town
-        </p>
-        <h1 id="hero-title">I build dependable systems for the moments that matter.</h1>
-        <p class="hero__intro">
-          Software engineering across the full product stack, with deep experience in back-end services, cloud
-          infrastructure, and data-intensive systems. Currently building credit systems at Capitec Bank. Previously
-          Amazon EC2 and OLX.
-        </p>
-        <div class="hero__actions">
-          <a class="button button--primary" href="#work">
-            Explore my work <ArrowIcon direction="down" />
-          </a>
-          <a class="text-link" href="#contact">
-            Start a conversation <ArrowIcon />
-          </a>
+  <AppShell active="home">
+    <main id="main" class="hub-page">
+      <section class="hub-hero shell" id="top" aria-labelledby="hero-title">
+        <div class="hub-hero__copy">
+          <p class="eyebrow">
+            <span class="status-dot" aria-hidden="true"></span> Software Engineer · Cape Town
+          </p>
+          <h1 id="hero-title">I build dependable systems for the moments that matter.</h1>
+          <p class="hub-hero__intro">
+            Full-stack product engineering with strong back-end depth across cloud infrastructure, data-intensive
+            systems, and software people need to trust.
+          </p>
+          <div class="hero__actions">
+            <a class="button button--primary" href="/work/">
+              Explore the systems <ArrowIcon />
+            </a>
+            <a class="text-link" href="#routes">
+              Choose your route <ArrowIcon direction="down" />
+            </a>
+          </div>
+          <dl class="hero__facts">
+            <div>
+              <dt>Current</dt>
+              <dd>{site.currentCompany}</dd>
+            </div>
+            <div>
+              <dt>Previously</dt>
+              <dd>Amazon EC2 · OLX</dd>
+            </div>
+            <div>
+              <dt>Based in</dt>
+              <dd>{site.location}</dd>
+            </div>
+          </dl>
         </div>
-        <dl class="hero__facts">
-          <div>
-            <dt>Based in</dt>
-            <dd>{site.location}</dd>
-          </div>
-          <div>
-            <dt>Focus</dt>
-            <dd>Full stack · Cloud · Data</dd>
-          </div>
-        </dl>
-      </div>
-      <SystemsMap />
-    </section>
+        <div class="hub-hero__map">
+          <SystemsMap />
+          <p>
+            <span>Live portfolio map</span> Select a node to inspect how the work connects.
+          </p>
+        </div>
+      </section>
 
-    <section class="proof-strip" aria-label="Career highlights">
-      <div class="shell proof-strip__inner">
-        <span>Current</span>
-        <strong>Capitec Bank</strong>
-        <span>Previously</span>
-        <strong>Amazon EC2</strong>
-        <strong>OLX</strong>
-        <span>5+ years across software and technical education</span>
-      </div>
-    </section>
-
-    <SelectedWork />
-    <EarlierWork />
-    <ExperienceTimeline />
-    <Capabilities />
-    <About />
-
-    <ContactForm />
-  </main>
-  <Footer />
+      <HubRoutes />
+    </main>
+  </AppShell>
 </BaseLayout>

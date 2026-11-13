@@ -1,11 +1,19 @@
 ---
-import ThemeToggle from './ThemeToggle.astro';
+import { portfolioRoutes, type PortfolioRouteId } from '../data/navigation';
 import ArrowIcon from './ArrowIcon.astro';
+import ThemeToggle from './ThemeToggle.astro';
+
+interface Props {
+  active?: PortfolioRouteId;
+}
+
+const { active } = Astro.props;
+const compactRoutes = portfolioRoutes.filter((route) => route.id !== 'home');
 ---
 
 <header class="site-header" data-site-header>
   <div class="shell site-header__inner">
-    <a class="brand" href="#top">
+    <a class="brand" href="/">
       <span class="brand__mark" aria-hidden="true">
         PM
       </span>
@@ -17,10 +25,12 @@ import ArrowIcon from './ArrowIcon.astro';
     </a>
 
     <nav class="site-nav" aria-label="Main navigation">
-      <a href="#work">Work</a>
-      <a href="#experience">Experience</a>
-      <a href="#about">About</a>
-      <a href="#contact">Contact</a>
+      {compactRoutes.map((route) => (
+        <a href={route.href} aria-current={active === route.id ? 'page' : undefined}>
+          {route.label}
+        </a>
+      ))}
+      <a href="/profile/#contact">Contact</a>
     </nav>
 
     <details class="mobile-menu">
@@ -29,10 +39,12 @@ import ArrowIcon from './ArrowIcon.astro';
         <span aria-hidden="true"></span>
       </summary>
       <nav aria-label="Mobile navigation">
-        <a href="#work">Work</a>
-        <a href="#experience">Experience</a>
-        <a href="#about">About</a>
-        <a href="#contact">Contact</a>
+        {portfolioRoutes.map((route) => (
+          <a href={route.href} aria-current={active === route.id ? 'page' : undefined}>
+            {route.label}
+          </a>
+        ))}
+        <a href="/profile/#contact">Contact</a>
       </nav>
     </details>
 

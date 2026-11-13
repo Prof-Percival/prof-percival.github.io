@@ -2,11 +2,17 @@
 import { site } from '../data/site';
 import ArrowIcon from './ArrowIcon.astro';
 import SectionHeading from './SectionHeading.astro';
+
+interface Props {
+  number?: string;
+}
+
+const { number = '06' } = Astro.props;
 ---
 
 <section class="section contact-section shell" id="contact" aria-labelledby="contact-title">
   <SectionHeading
-    number="06"
+    number={number}
     eyebrow="Contact"
     id="contact-title"
     title="Good systems start with a clear conversation."

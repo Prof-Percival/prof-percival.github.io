@@ -1,0 +1,33 @@
+---
+import About from '../../components/About.astro';
+import AppShell from '../../components/AppShell.astro';
+import Capabilities from '../../components/Capabilities.astro';
+import ContactForm from '../../components/ContactForm.astro';
+import RouteHero from '../../components/RouteHero.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="Profile | Phadima Percival Maredi"
+  description="Capabilities, education, credentials, languages, community work, CV, and contact details for software engineer Phadima Percival Maredi."
+>
+  <AppShell active="profile">
+    <main id="main" class="route-page profile-route">
+      <RouteHero
+        number="03"
+        eyebrow="Profile"
+        title="Full-stack range. Back-end depth."
+        introduction="The tools matter because of what they make possible: clearer boundaries, dependable behavior, safer delivery, and software people can understand."
+      >
+        <div class="route-hero__facts" aria-label="Profile route summary">
+          <span>Software Engineer</span>
+          <span>100+ completed credentials</span>
+          <span>Six working languages</span>
+        </div>
+      </RouteHero>
+      <Capabilities number="01" />
+      <About number="02" />
+      <ContactForm number="03" />
+    </main>
+  </AppShell>
+</BaseLayout>

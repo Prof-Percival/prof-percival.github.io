@@ -1,0 +1,31 @@
+---
+import AppShell from '../../components/AppShell.astro';
+import EarlierWork from '../../components/EarlierWork.astro';
+import RouteHero from '../../components/RouteHero.astro';
+import SelectedWork from '../../components/SelectedWork.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="Work | Phadima Percival Maredi"
+  description="Software engineering case studies, systems, product work, and interactive project labs by Phadima Percival Maredi."
+>
+  <AppShell active="work">
+    <main id="main" class="route-page work-route">
+      <RouteHero
+        number="01"
+        eyebrow="Work"
+        title="Systems with decisions you can inspect."
+        introduction="Start with the flagship systems, then move through product work, data, desktop software, and low-level foundations. Each project earns its place through a distinct engineering decision or working interaction."
+      >
+        <div class="route-hero__facts" aria-label="Work route summary">
+          <span>Flagship systems</span>
+          <span>Interactive labs</span>
+          <span>Private source handled honestly</span>
+        </div>
+      </RouteHero>
+      <SelectedWork />
+      <EarlierWork />
+    </main>
+  </AppShell>
+</BaseLayout>

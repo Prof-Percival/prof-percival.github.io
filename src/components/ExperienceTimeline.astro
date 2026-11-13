@@ -1,12 +1,18 @@
 ---
 import { experience } from '../data/portfolio';
 import SectionHeading from './SectionHeading.astro';
+
+interface Props {
+  number?: string;
+}
+
+const { number = '03' } = Astro.props;
 ---
 
 <section class="section experience-section" id="experience" aria-labelledby="experience-title">
   <div class="shell">
     <SectionHeading
-      number="03"
+      number={number}
       eyebrow="Experience"
       id="experience-title"
       title="Full-stack range. Back-end depth."

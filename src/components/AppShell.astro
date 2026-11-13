@@ -1,0 +1,21 @@
+---
+import type { PortfolioRouteId } from '../data/navigation';
+import Footer from './Footer.astro';
+import Header from './Header.astro';
+import SiteRail from './SiteRail.astro';
+
+interface Props {
+  active?: PortfolioRouteId;
+}
+
+const { active } = Astro.props;
+---
+
+<div class="app-shell" data-route={active ?? 'none'}>
+  <SiteRail active={active} />
+  <div class="app-shell__content">
+    <Header active={active} />
+    <slot />
+    <Footer />
+  </div>
+</div>

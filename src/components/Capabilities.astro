@@ -1,11 +1,17 @@
 ---
 import { capabilityGroups } from '../data/portfolio';
 import SectionHeading from './SectionHeading.astro';
+
+interface Props {
+  number?: string;
+}
+
+const { number = '04' } = Astro.props;
 ---
 
 <section class="section capabilities-section shell" aria-labelledby="capabilities-title">
   <SectionHeading
-    number="04"
+    number={number}
     eyebrow="Capabilities"
     id="capabilities-title"
     title="Tools grouped by what they help me deliver."

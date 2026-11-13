@@ -1,7 +1,6 @@
 ---
+import AppShell from '../../components/AppShell.astro';
 import ArrowIcon from '../../components/ArrowIcon.astro';
-import Footer from '../../components/Footer.astro';
-import Header from '../../components/Header.astro';
 import MissingChildrenVisual from '../../components/MissingChildrenVisual.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { missingChildrenCaseStudy as project } from '../../data/portfolio';
@@ -11,79 +10,79 @@ import { missingChildrenCaseStudy as project } from '../../data/portfolio';
   title={`${project.title} | Case study | Phadima Percival Maredi`}
   description={`${project.summary} A software engineering case study by Phadima Percival Maredi.`}
 >
-  <Header />
-  <main id="main">
-    <article class="case-study">
-      <header class="case-study__hero shell">
-        <a class="text-link case-study__back" href="/#work">
-          <ArrowIcon direction="left" /> Back to selected work
-        </a>
-        <p class="eyebrow">Case study / {project.eyebrow}</p>
-        <h1>{project.title}</h1>
-        <p class="case-study__summary">{project.summary}</p>
-        <ul class="tag-list" aria-label="Project technologies">
-          {project.stack.map((item) => (
-            <li>{item}</li>
-          ))}
-        </ul>
-      </header>
-
-      <div class="case-study__visual shell">
-        <MissingChildrenVisual />
-      </div>
-
-      <div class="case-study__body shell">
-        <section aria-labelledby="challenge-title">
-          <p class="eyebrow">01 / The challenge</p>
-          <h2 id="challenge-title">Move quickly without skipping trust.</h2>
-          <p>{project.challenge}</p>
-        </section>
-
-        <section aria-labelledby="system-title">
-          <p class="eyebrow">02 / The system</p>
-          <h2 id="system-title">One workflow, three purpose-built surfaces.</h2>
-          <p>{project.contribution}</p>
-          <div class="surface-grid">
-            {project.surfaces.map((surface, index) => (
-              <article>
-                <span>{String(index + 1).padStart(2, '0')}</span>
-                <h3>{surface.label}</h3>
-                <p>{surface.detail}</p>
-              </article>
-            ))}
-          </div>
-        </section>
-
-        <section aria-labelledby="decisions-title">
-          <p class="eyebrow">03 / Engineering decisions</p>
-          <h2 id="decisions-title">The architecture follows the risk.</h2>
-          <div class="decision-list">
-            {project.decisions.map((decision, index) => (
-              <article>
-                <span>{String(index + 1).padStart(2, '0')}</span>
-                <div>
-                  <h3>{decision.title}</h3>
-                  <p>{decision.detail}</p>
-                </div>
-              </article>
-            ))}
-          </div>
-        </section>
-
-        <section class="case-study__closing" aria-labelledby="closing-title">
-          <p class="eyebrow">04 / What this demonstrates</p>
-          <h2 id="closing-title">Full-stack delivery with the back-end carrying the contract.</h2>
-          <p>
-            The useful part is not the number of applications. It is the separation of concerns: clients can evolve
-            around their users while the API keeps authentication, moderation, data history, statistics, and media
-            boundaries consistent.
-          </p>
-          <a class="button button--primary" href="/#contact">
-            Discuss a system like this <ArrowIcon />
+  <AppShell active="work">
+    <main id="main">
+      <article class="case-study">
+        <header class="case-study__hero shell">
+          <a class="text-link case-study__back" href="/work/">
+            <ArrowIcon direction="left" /> Back to selected work
           </a>
-        </section>
-      </div>
-    </article>
-  </main>
-  <Footer />
+          <p class="eyebrow">Case study / {project.eyebrow}</p>
+          <h1>{project.title}</h1>
+          <p class="case-study__summary">{project.summary}</p>
+          <ul class="tag-list" aria-label="Project technologies">
+            {project.stack.map((item) => (
+              <li>{item}</li>
+            ))}
+          </ul>
+        </header>
+
+        <div class="case-study__visual shell">
+          <MissingChildrenVisual />
+        </div>
+
+        <div class="case-study__body shell">
+          <section aria-labelledby="challenge-title">
+            <p class="eyebrow">01 / The challenge</p>
+            <h2 id="challenge-title">Move quickly without skipping trust.</h2>
+            <p>{project.challenge}</p>
+          </section>
+
+          <section aria-labelledby="system-title">
+            <p class="eyebrow">02 / The system</p>
+            <h2 id="system-title">One workflow, three purpose-built surfaces.</h2>
+            <p>{project.contribution}</p>
+            <div class="surface-grid">
+              {project.surfaces.map((surface, index) => (
+                <article>
+                  <span>{String(index + 1).padStart(2, '0')}</span>
+                  <h3>{surface.label}</h3>
+                  <p>{surface.detail}</p>
+                </article>
+              ))}
+            </div>
+          </section>
+
+          <section aria-labelledby="decisions-title">
+            <p class="eyebrow">03 / Engineering decisions</p>
+            <h2 id="decisions-title">The architecture follows the risk.</h2>
+            <div class="decision-list">
+              {project.decisions.map((decision, index) => (
+                <article>
+                  <span>{String(index + 1).padStart(2, '0')}</span>
+                  <div>
+                    <h3>{decision.title}</h3>
+                    <p>{decision.detail}</p>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </section>
+
+          <section class="case-study__closing" aria-labelledby="closing-title">
+            <p class="eyebrow">04 / What this demonstrates</p>
+            <h2 id="closing-title">Full-stack delivery with the back-end carrying the contract.</h2>
+            <p>
+              The useful part is not the number of applications. It is the separation of concerns: clients can evolve
+              around their users while the API keeps authentication, moderation, data history, statistics, and media
+              boundaries consistent.
+            </p>
+            <a class="button button--primary" href="/profile/#contact">
+              Discuss a system like this <ArrowIcon />
+            </a>
+          </section>
+        </div>
+      </article>
+    </main>
+  </AppShell>
 </BaseLayout>
