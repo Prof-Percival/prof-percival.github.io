@@ -549,20 +549,24 @@ test.describe('profile route', () => {
 
     for (const credential of [
       'Java',
-      'Data Science Foundations, Level 1',
+      'Data Science Foundations - Level 1',
       'Data Science Tools',
       'Python Essentials 1',
       'Introduction to Cybersecurity',
     ]) {
       await expect(page.getByRole('link', { name: new RegExp(credential) })).toBeVisible();
     }
-    await expect(page.locator('.credential-card__category')).toHaveText([
-      'Back-end',
-      'Data',
-      'Data',
-      'Back-end',
-      'Security',
-    ]);
+    await expect(page.getByText('Eighteen shown from 114+ certifications listed on LinkedIn.')).toBeVisible();
+    await expect(page.getByRole('heading', { level: 4, name: 'Recent eight' })).toBeVisible();
+    await expect(page.getByRole('heading', { level: 4, name: 'Ten complementary certifications' })).toBeVisible();
+    await expect(page.locator('[data-certification-group="recent"] > a')).toHaveCount(8);
+    await expect(page.locator('[data-certification-group="selected"] > a')).toHaveCount(10);
+    await expect(page.locator('.credential-card__category')).toHaveCount(18);
+    await expect(page.locator('[data-credential-source="linkedin"]')).toHaveCount(3);
+    await expect(page.getByRole('link', { name: /View all certifications on LinkedIn/ })).toHaveAttribute(
+      'href',
+      'https://www.linkedin.com/in/prof-percival/details/certifications/'
+    );
 
     await pageIndex.getByRole('link', { name: /Languages/ }).click();
     await expect(page).toHaveURL(/#languages$/);
@@ -579,16 +583,16 @@ test.describe('profile route', () => {
   test('adapts credential cards to their available section width', async ({ page, isMobile }) => {
     test.skip(isMobile, 'One desktop browser can exercise both container widths.');
 
-    const columnCountAt = async (width: number) => {
+    const columnCountsAt = async (width: number) => {
       await page.setViewportSize({ width, height: 900 });
       await page.goto('/profile/');
       return page
         .locator('.credential-grid')
-        .evaluate((grid) => getComputedStyle(grid).gridTemplateColumns.split(' ').length);
+        .evaluateAll((grids) => grids.map((grid) => getComputedStyle(grid).gridTemplateColumns.split(' ').length));
     };
 
-    expect(await columnCountAt(1366)).toBeGreaterThan(1);
-    expect(await columnCountAt(700)).toBe(1);
+    expect((await columnCountsAt(1366)).every((count) => count > 1)).toBe(true);
+    expect(await columnCountsAt(700)).toEqual([1, 1]);
   });
 
   test('keeps languages and community content separate at intermediate desktop widths', async ({ page, isMobile }) => {

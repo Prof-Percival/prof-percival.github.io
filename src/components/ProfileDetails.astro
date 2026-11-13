@@ -1,7 +1,26 @@
 ---
-import { certifications, community, languages } from '../data/portfolio';
+import { certifications, community, languages, linkedInCertificationCount } from '../data/portfolio';
 import { site } from '../data/site';
 import ArrowIcon from './ArrowIcon.astro';
+
+const certificationGroups = [
+  {
+    id: 'recent',
+    eyebrow: '01 / Recent',
+    title: 'Recent eight',
+    description: 'Eight recent certifications spanning AI, software engineering, leadership, and technology.',
+    start: 1,
+    items: certifications.filter((certification) => certification.group === 'recent'),
+  },
+  {
+    id: 'selected',
+    eyebrow: '02 / Selected for range',
+    title: 'Ten complementary certifications',
+    description: 'A cross-section of back-end, full-stack, cloud, data, security, and accessibility learning.',
+    start: 9,
+    items: certifications.filter((certification) => certification.group === 'selected'),
+  },
+] as const;
 ---
 
 <div class="profile-details">
@@ -10,28 +29,50 @@ import ArrowIcon from './ArrowIcon.astro';
       <p class="eyebrow">Selected certifications</p>
       <div>
         <h3 id="credentials-title">Evidence of continuous learning.</h3>
-        <p>A focused selection from more than 100 completed certifications.</p>
+        <p>Eighteen shown from {linkedInCertificationCount}+ certifications listed on LinkedIn.</p>
       </div>
     </div>
-    <div class="credential-grid">
-      {certifications.map((credential, index) => (
-        <a href={credential.url} target="_blank" rel="noopener noreferrer" data-track="credential-open">
-          <span class="credential-card__number">{String(index + 1).padStart(2, '0')}</span>
-          <div class="credential-card__copy">
-            <span class="credential-card__category">{credential.category}</span>
-            <strong>{credential.title}</strong>
-            <small>
-              {credential.issuer} · {credential.issued}
-            </small>
+    <div class="credential-groups">
+      {certificationGroups.map((group) => (
+        <section class="credential-group" aria-labelledby={`credential-group-${group.id}`}>
+          <header class="credential-group__header">
+            <div>
+              <p class="eyebrow">{group.eyebrow}</p>
+              <h4 id={`credential-group-${group.id}`}>{group.title}</h4>
+            </div>
+            <p>{group.description}</p>
+          </header>
+          <div class="credential-grid" data-certification-group={group.id}>
+            {group.items.map((credential, index) => (
+              <a
+                href={'url' in credential ? credential.url : site.links.linkedinCertifications}
+                target="_blank"
+                rel="noopener noreferrer"
+                data-track={'url' in credential ? 'credential-open' : 'linkedin-certification-open'}
+                data-credential-source={'url' in credential ? 'issuer' : 'linkedin'}
+              >
+                <span class="credential-card__number">{String(group.start + index).padStart(2, '0')}</span>
+                <div class="credential-card__copy">
+                  <span class="credential-card__category">{credential.category}</span>
+                  <strong>{credential.title}</strong>
+                  <small>
+                    {credential.issuer} · {credential.issued}
+                  </small>
+                </div>
+                <ArrowIcon />
+                <span class="sr-only">
+                  {'url' in credential ? 'Verify credential.' : 'View this certification on LinkedIn.'} (opens in a new
+                  tab)
+                </span>
+              </a>
+            ))}
           </div>
-          <ArrowIcon />
-          <span class="sr-only">(opens in a new tab)</span>
-        </a>
+        </section>
       ))}
     </div>
     <a
       class="text-link credentials__all"
-      href={site.links.linkedin}
+      href={site.links.linkedinCertifications}
       target="_blank"
       rel="noopener noreferrer"
       data-track="linkedin-credentials"

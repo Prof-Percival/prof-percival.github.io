@@ -12,6 +12,7 @@ export const site = {
   links: {
     github: 'https://github.com/Prof-Percival',
     linkedin: 'https://za.linkedin.com/in/prof-percival',
+    linkedinCertifications: 'https://www.linkedin.com/in/prof-percival/details/certifications/',
     resume: '/resume/percival-maredi-cv.pdf',
   },
   contact: {
