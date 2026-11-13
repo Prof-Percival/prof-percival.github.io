@@ -18,6 +18,16 @@ export type EarlierProject = {
   alt: string;
 };
 
+export type Certification = {
+  group: 'recent' | 'selected';
+  title: string;
+  category: string;
+  issuer: string;
+  issued: string;
+  issuedAt: `${number}-${number}`;
+  url?: string;
+};
+
 export const experience: Experience[] = [
   {
     company: 'Capitec Bank',
@@ -155,43 +165,169 @@ export const education = [
   },
 ] as const;
 
+export const linkedInCertificationCount = 114;
+
 export const certifications = [
   {
+    group: 'recent',
+    title: 'From Prototype toward Production with AgentCore',
+    category: 'AI systems',
+    issuer: 'Amazon Web Services (AWS)',
+    issued: 'October 2026',
+    issuedAt: '2026-10',
+  },
+  {
+    group: 'recent',
+    title: 'AI Literacy',
+    category: 'AI',
+    issuer: 'IBM',
+    issued: 'June 2026',
+    issuedAt: '2026-06',
+    url: 'https://www.credly.com/badges/ef25f09e-8c13-4950-911c-28fdec13ee1f',
+  },
+  {
+    group: 'recent',
+    title: 'Building Generative AI Solutions - OLX',
+    category: 'Generative AI',
+    issuer: 'Udacity',
+    issued: 'May 2025',
+    issuedAt: '2025-05',
+    url: 'https://www.udacity.com/certificate/e/c66d792e-137e-11f0-bc0c-1b41a922a47c',
+  },
+  {
+    group: 'recent',
+    title: 'Introduction to OpenAI API & ChatGPT API for Developers',
+    category: 'AI development',
+    issuer: 'Udemy',
+    issued: 'January 2025',
+    issuedAt: '2025-01',
+    url: 'https://www.udemy.com/certificate/UC-84ac13dc-d56d-451b-9506-f2c8f2afb8d6/',
+  },
+  {
+    group: 'recent',
+    title: 'ALX AI Career Essentials',
+    category: 'AI',
+    issuer: 'ALX Africa',
+    issued: 'July 2024',
+    issuedAt: '2024-07',
+    url: 'https://savanna.alxafrica.com/certificates/Hn32NYSCEp',
+  },
+  {
+    group: 'recent',
+    title: 'ALX Software Engineering',
+    category: 'Software engineering',
+    issuer: 'ALX Africa',
+    issued: 'March 2024',
+    issuedAt: '2024-03',
+  },
+  {
+    group: 'recent',
+    title: 'OMET Peer Buddy Leadership',
+    category: 'Leadership',
+    issuer: 'Old Mutual South Africa',
+    issued: 'December 2023',
+    issuedAt: '2023-12',
+  },
+  {
+    group: 'recent',
+    title: 'Tech for Everyone',
+    category: 'Technology',
+    issuer: 'Sololearn',
+    issued: 'December 2023',
+    issuedAt: '2023-12',
+    url: 'https://www.sololearn.com/Certificate/CC-RBLNWPJY/png',
+  },
+  {
+    group: 'selected',
+    title: 'C#',
+    category: 'Back-end',
+    issuer: 'Sololearn',
+    issued: 'January 2023',
+    issuedAt: '2023-01',
+    url: 'https://www.sololearn.com/certificates/course/en/18637754/1080/landscape/png',
+  },
+  {
+    group: 'selected',
     title: 'Java',
     category: 'Back-end',
     issuer: 'Sololearn',
     issued: 'December 2022',
+    issuedAt: '2022-12',
     url: 'https://www.sololearn.com/certificates/course/en/18637754/1068/landscape/png',
   },
   {
-    title: 'Data Science Foundations, Level 1',
-    category: 'Data',
-    issuer: 'IBM',
-    issued: 'October 2022',
-    url: 'https://www.credly.com/badges/2b3f0a66-b873-4f2c-819a-ccde0fc984c2/public_url',
-  },
-  {
-    title: 'Data Science Tools',
-    category: 'Data',
-    issuer: 'IBM',
-    issued: 'October 2022',
-    url: 'https://www.credly.com/badges/7e3a7c89-1926-439b-9244-461feab4f8dd/public_url',
-  },
-  {
+    group: 'selected',
     title: 'Python Essentials 1',
     category: 'Back-end',
     issuer: 'Cisco Networking Academy',
     issued: 'July 2022',
+    issuedAt: '2022-07',
     url: 'https://www.credly.com/badges/7aebd032-7b67-4209-b825-c93ddfc01188/public_url',
   },
   {
+    group: 'selected',
+    title: 'React + Redux',
+    category: 'Front-end',
+    issuer: 'Sololearn',
+    issued: 'January 2023',
+    issuedAt: '2023-01',
+    url: 'https://www.sololearn.com/certificates/course/en/18637754/1097/landscape/png',
+  },
+  {
+    group: 'selected',
+    title: 'Full-Stack Web Development',
+    category: 'Full-stack',
+    issuer: 'Udemy',
+    issued: 'December 2022',
+    issuedAt: '2022-12',
+    url: 'https://www.udemy.com/certificate/UC-45c8a69d-8591-4ec7-9294-0d7e55be5b82/',
+  },
+  {
+    group: 'selected',
+    title: 'Microsoft Azure Fundamentals: Describe cloud concepts',
+    category: 'Cloud',
+    issuer: 'Microsoft',
+    issued: 'December 2022',
+    issuedAt: '2022-12',
+    url: 'https://learn.microsoft.com/en-gb/training/achievements/learn.wwl.microsoft-azure-fundamentals-describe-cloud-concepts.trophy?username=PhadimaPercivalMaredi-1929',
+  },
+  {
+    group: 'selected',
+    title: 'Data Science Foundations - Level 1',
+    category: 'Data',
+    issuer: 'IBM',
+    issued: 'October 2022',
+    issuedAt: '2022-10',
+    url: 'https://www.credly.com/badges/2b3f0a66-b873-4f2c-819a-ccde0fc984c2/public_url',
+  },
+  {
+    group: 'selected',
+    title: 'Data Science Tools',
+    category: 'Data',
+    issuer: 'IBM',
+    issued: 'October 2022',
+    issuedAt: '2022-10',
+    url: 'https://www.credly.com/badges/7e3a7c89-1926-439b-9244-461feab4f8dd/public_url',
+  },
+  {
+    group: 'selected',
     title: 'Introduction to Cybersecurity',
     category: 'Security',
     issuer: 'Cisco Networking Academy',
     issued: 'July 2021',
+    issuedAt: '2021-07',
     url: 'https://www.credly.com/badges/4d6cfdb1-37c3-4d40-9cd4-ae86ffc62bba/public_url',
   },
-] as const;
+  {
+    group: 'selected',
+    title: 'Accessibility, special education, and online learning: Supporting equity in a remote learning environment',
+    category: 'Accessibility',
+    issuer: 'Microsoft',
+    issued: 'March 2023',
+    issuedAt: '2023-03',
+    url: 'https://learn.microsoft.com/en-us/training/achievements/learn.mec.accessibility-special-education-online-learning-equity.badge?username=PhadimaPercivalMaredi-3609&sharingId=39709B2ADFF2D158',
+  },
+] as const satisfies readonly Certification[];
 
 export const languages = [
   { name: 'Sepedi', proficiency: 'Native or bilingual' },

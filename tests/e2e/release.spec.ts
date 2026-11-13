@@ -62,7 +62,7 @@ test.describe('release integrity', () => {
             if (!leavesPortfolio) return [];
 
             const rel = new Set(anchor.rel.split(/\s+/).filter(Boolean));
-            const announcesNewTab = anchor.textContent?.includes('(opens in a new tab)') ?? false;
+            const announcesNewTab = /opens in a\s+new tab/i.test(anchor.textContent ?? '');
             return anchor.target === '_blank' && rel.has('noopener') && rel.has('noreferrer') && announcesNewTab
               ? []
               : [
