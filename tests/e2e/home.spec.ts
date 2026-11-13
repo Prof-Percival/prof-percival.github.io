@@ -605,11 +605,13 @@ test.describe('contact form', () => {
 
   test('aligns the contact deep link after the page finishes loading', async ({ page }) => {
     await page.waitForLoadState('load');
-    const heading = await page
-      .getByRole('heading', { name: 'Good systems start with a clear conversation.' })
-      .boundingBox();
-    expect(heading).not.toBeNull();
-    expect(heading!.y).toBeLessThan(page.viewportSize()!.height / 2);
+    const heading = page.getByRole('heading', { name: 'Good systems start with a clear conversation.' });
+    await expect
+      .poll(async () => {
+        const bounds = await heading.boundingBox();
+        return Boolean(bounds && bounds.y >= 0 && bounds.y < page.viewportSize()!.height / 2);
+      })
+      .toBe(true);
   });
 
   test('uses the dedicated Formspree endpoint and visible labels', async ({ page }) => {
