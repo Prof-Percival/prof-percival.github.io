@@ -1,6 +1,7 @@
 ---
 import AppShell from '../../components/AppShell.astro';
 import ExperienceTimeline from '../../components/ExperienceTimeline.astro';
+import JourneyMap from '../../components/JourneyMap.astro';
 import RouteHero from '../../components/RouteHero.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 ---
@@ -15,15 +16,21 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
         number="02"
         eyebrow="Journey"
         title="A career connected by the problems underneath it."
-        introduction="The roles changed, but the thread stayed consistent: follow a difficult problem across interfaces, services, data, delivery, and operations."
+        introduction="Select a role to follow the connected route, or continue to the full chronology. The thread stays consistent: follow a difficult problem across interfaces, services, data, delivery, and operations."
       >
         <div class="route-hero__facts" aria-label="Journey route summary">
-          <span>Product to infrastructure</span>
+          <span>Connected role map</span>
           <span>2020 to present</span>
-          <span>Cape Town</span>
+          <span>Full chronology included</span>
         </div>
       </RouteHero>
-      <ExperienceTimeline number="01" />
+      <JourneyMap />
+      <ExperienceTimeline
+        number="02"
+        eyebrow="Full chronology"
+        title="Every role, in document order."
+        introduction="The chronological view keeps every published date, role summary, highlight, location, and technology available without relying on the interactive map."
+      />
     </main>
   </AppShell>
 </BaseLayout>

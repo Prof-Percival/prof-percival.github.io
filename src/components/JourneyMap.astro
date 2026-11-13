@@ -1,0 +1,141 @@
+---
+import { journeyNodes, journeyProjectLinks } from '../data/journey';
+import ArrowIcon from './ArrowIcon.astro';
+
+const selectedId = 'capitec';
+---
+
+<section class="section journey-map-section shell" aria-labelledby="journey-map-title">
+  <header class="journey-map__header">
+    <div>
+      <p class="eyebrow">01 / Connected route</p>
+      <h2 id="journey-map-title">See how each role changed the next problem I could own.</h2>
+    </div>
+    <div>
+      <p>Select a node to inspect the role, its engineering chapter, and related portfolio evidence.</p>
+      <small>Portfolio projects are listed separately below. None is attributed to an employer.</small>
+    </div>
+  </header>
+
+  <div class="journey-map" data-journey-map>
+    <div class="journey-map__stage" role="group" aria-label="Career route nodes">
+      <svg
+        viewBox="0 0 1000 560"
+        role="img"
+        aria-label="Career route from independent delivery and teaching through OLX, Amazon, and Capitec Bank"
+      >
+        <path class="journey-map__base" d="M120 403 C250 390 345 390 480 370 S615 280 680 190 S800 120 880 101"></path>
+        <path class="journey-map__trace" d="M120 403 C250 390 345 390 480 370 S615 280 680 190 S800 120 880 101"></path>
+        <path class="journey-map__branch" d="M300 202 C355 245 405 310 480 370"></path>
+      </svg>
+
+      {journeyNodes.map((node, index) => (
+        <button
+          type="button"
+          class="journey-node"
+          style={`--node-x:${node.x}%;--node-y:${node.y}%;--node-order:${index}`}
+          aria-controls={`journey-detail-${node.id}`}
+          aria-pressed={node.id === selectedId ? 'true' : 'false'}
+          data-journey-node={node.id}
+          data-index={index}
+        >
+          <span>{node.shortPeriod}</span>
+          <strong>{node.company}</strong>
+          {node.current && <small>Current</small>}
+        </button>
+      ))}
+
+      <div class="journey-map__legend" aria-hidden="true">
+        <span></span> Main engineering route <i></i> Concurrent teaching chapter
+      </div>
+    </div>
+
+    <aside class="journey-drawer" aria-label="Selected career chapter">
+      {journeyNodes.map((node) => (
+        <article id={`journey-detail-${node.id}`} data-journey-detail={node.id} hidden={node.id !== selectedId}>
+          <div class="journey-drawer__index">
+            <span>{node.shortPeriod}</span>
+            {node.current && <strong>Current role</strong>}
+          </div>
+          <p class="eyebrow">{node.chapter}</p>
+          <h3>{node.company}</h3>
+          <p class="journey-drawer__role">{node.role}</p>
+          <dl>
+            <div>
+              <dt>Period</dt>
+              <dd>{node.period}</dd>
+            </div>
+            <div>
+              <dt>Location</dt>
+              <dd>{node.location}</dd>
+            </div>
+          </dl>
+          <p class="journey-drawer__summary">{node.summary}</p>
+          <ul class="tag-list" aria-label={`${node.company} technologies`}>
+            {node.stack.map((item) => (
+              <li>{item}</li>
+            ))}
+          </ul>
+          <div class="journey-drawer__related">
+            <span>Continue exploring</span>
+            {node.related.map((link) => (
+              <a href={link.href}>
+                <small>{link.relationship}</small>
+                <strong>{link.label}</strong>
+                <ArrowIcon />
+              </a>
+            ))}
+          </div>
+        </article>
+      ))}
+      <p class="form-status" role="status" aria-live="polite" aria-atomic="true" data-journey-status>
+        Capitec Bank selected. Current role.
+      </p>
+    </aside>
+  </div>
+
+  <nav class="journey-projects" aria-label="Portfolio systems presented separately from employment">
+    <div>
+      <p class="eyebrow">Portfolio systems</p>
+      <strong>Explore project evidence separately from the career record.</strong>
+    </div>
+    {journeyProjectLinks.map((link) => (
+      <a href={link.href}>
+        {link.label}
+        <ArrowIcon />
+      </a>
+    ))}
+  </nav>
+</section>
+
+<script>
+  import { selectJourneyNode } from '../data/journey';
+
+  document.querySelectorAll<HTMLElement>('[data-journey-map]').forEach((map) => {
+    const nodes = Array.from(map.querySelectorAll<HTMLButtonElement>('[data-journey-node]'));
+    const details = Array.from(map.querySelectorAll<HTMLElement>('[data-journey-detail]'));
+    const status = map.querySelector<HTMLElement>('[data-journey-status]');
+    if (nodes.length === 0 || details.length !== nodes.length || !status) return;
+
+    const select = (id: string, focus = false) => {
+      const selected = selectJourneyNode(id);
+      nodes.forEach((node) => node.setAttribute('aria-pressed', String(node.dataset.journeyNode === selected.id)));
+      details.forEach((detail) => (detail.hidden = detail.dataset.journeyDetail !== selected.id));
+      status.textContent = `${selected.company} selected. ${selected.current ? 'Current role.' : selected.period + '.'}`;
+      if (focus) nodes.find((node) => node.dataset.journeyNode === selected.id)?.focus();
+    };
+
+    nodes.forEach((node, index) => {
+      node.addEventListener('click', () => select(node.dataset.journeyNode ?? 'capitec'));
+      node.addEventListener('keydown', (event) => {
+        if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
+        event.preventDefault();
+        const change = event.key === 'ArrowRight' ? 1 : -1;
+        const nextIndex = Math.min(nodes.length - 1, Math.max(0, index + change));
+        select(nodes[nextIndex]?.dataset.journeyNode ?? 'capitec', true);
+      });
+    });
+    map.dataset.enhanced = 'true';
+    select('capitec');
+  });
+</script>
