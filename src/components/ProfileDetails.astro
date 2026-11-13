@@ -27,7 +27,13 @@ import ArrowIcon from './ArrowIcon.astro';
         </a>
       ))}
     </div>
-    <a class="text-link credentials__all" href={site.links.linkedin} data-track="linkedin-credentials">
+    <a
+      class="text-link credentials__all"
+      href={site.links.linkedin}
+      target="_blank"
+      rel="noopener noreferrer"
+      data-track="linkedin-credentials"
+    >
       View the complete credential list on LinkedIn <ArrowIcon />
     </a>
   </section>

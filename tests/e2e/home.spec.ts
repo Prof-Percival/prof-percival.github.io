@@ -551,6 +551,51 @@ test.describe('profile route', () => {
     await expect(page.getByRole('heading', { name: 'Student Intern' })).toBeVisible();
     await expectAccessibleAndContained(page);
   });
+
+  test('keeps languages and community content separate at intermediate desktop widths', async ({ page, isMobile }) => {
+    test.skip(isMobile, 'Intermediate desktop widths use the desktop browser project.');
+
+    for (const width of [1024, 1152, 1280, 1366]) {
+      await page.setViewportSize({ width, height: 900 });
+      await page.goto('/profile/');
+      const secondary = page.locator('.profile-details__secondary');
+      await secondary.scrollIntoViewIfNeeded();
+
+      const layout = await secondary.evaluate((element) => {
+        const rectangle = (selector: string) => {
+          const target = element.querySelector<HTMLElement>(selector);
+          if (!target) throw new Error(`Missing profile element: ${selector}`);
+          const bounds = target.getBoundingClientRect();
+          return {
+            top: bounds.top,
+            right: bounds.right,
+            bottom: bounds.bottom,
+            left: bounds.left,
+          };
+        };
+        const overlaps = (left: ReturnType<typeof rectangle>, right: ReturnType<typeof rectangle>) =>
+          left.left < right.right && left.right > right.left && left.top < right.bottom && left.bottom > right.top;
+        const languageSection = rectangle('.language-section');
+        const languageHeading = rectangle('.language-section .profile-subheading h3');
+        const communityHeading = rectangle('.community-section .profile-subheading');
+        const communitySection = element.querySelector<HTMLElement>('.community-section');
+        if (!communitySection) throw new Error('Missing community section');
+
+        return {
+          headingsOverlap: overlaps(languageHeading, communityHeading),
+          languageHeadingContained:
+            languageHeading.left >= languageSection.left && languageHeading.right <= languageSection.right + 1,
+          secondaryOverflow: element.scrollWidth - element.clientWidth,
+          communityOverflow: communitySection.scrollWidth - communitySection.clientWidth,
+        };
+      });
+
+      expect(layout.headingsOverlap, `${width}px headings should not overlap`).toBe(false);
+      expect(layout.languageHeadingContained, `${width}px language heading should stay in its section`).toBe(true);
+      expect(layout.secondaryOverflow, `${width}px secondary content should not overflow`).toBeLessThanOrEqual(0);
+      expect(layout.communityOverflow, `${width}px community content should not overflow`).toBeLessThanOrEqual(0);
+    }
+  });
 });
 
 test.describe('contact form', () => {

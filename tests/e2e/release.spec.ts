@@ -46,6 +46,33 @@ test.describe('release integrity', () => {
     }
   });
 
+  test('opens external destinations and documents without replacing the portfolio', async ({ page, isMobile }) => {
+    test.skip(isMobile, 'One browser pass covers shared link behavior.');
+    const violations: string[] = [];
+
+    for (const route of publishedRoutes) {
+      await page.goto(route);
+      violations.push(
+        ...(await page.locator('a[href]').evaluateAll((links) =>
+          links.flatMap((link) => {
+            const anchor = link as HTMLAnchorElement;
+            const destination = new URL(anchor.href);
+            const leavesPortfolio =
+              destination.origin !== window.location.origin || destination.pathname.toLowerCase().endsWith('.pdf');
+            if (!leavesPortfolio) return [];
+
+            const rel = new Set(anchor.rel.split(/\s+/).filter(Boolean));
+            return anchor.target === '_blank' && rel.has('noopener') && rel.has('noreferrer')
+              ? []
+              : [`${anchor.textContent?.trim() ?? anchor.href}: ${anchor.target || 'same tab'}; rel=${anchor.rel}`];
+          })
+        ))
+      );
+    }
+
+    expect(violations).toEqual([]);
+  });
+
   test('removes project entrance motion when reduced motion is requested', async ({ page }) => {
     await page.goto('/work/fraud-rule-engine/');
     await expect(page.locator('.case-study__hero h1')).not.toHaveCSS('animation-name', 'none');
