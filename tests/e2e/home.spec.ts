@@ -18,7 +18,7 @@ test.describe('interactive portfolio hub', () => {
     await page.goto('/');
   });
 
-  test('presents a concise identity and four clear routes', async ({ page }) => {
+  test('presents a concise identity and focused routes', async ({ page }) => {
     await expect(page).toHaveTitle(/Phadima Percival Maredi/);
     await expect(page.getByRole('heading', { level: 1 })).toHaveText(/dependable systems/i);
     await expect(page.getByText(/Full-stack product engineering with strong back-end depth/i)).toBeVisible();
@@ -28,6 +28,7 @@ test.describe('interactive portfolio hub', () => {
       ['See systems, not a screenshot wall.', '/work/'],
       ['Trace the work behind the roles.', '/journey/'],
       ['See the range behind the depth.', '/profile/'],
+      ['Ask a question. Inspect the source.', '/guide/'],
     ]) {
       await expect(page.getByRole('link', { name: new RegExp(name) })).toHaveAttribute('href', href);
     }
@@ -43,6 +44,11 @@ test.describe('interactive portfolio hub', () => {
     await expect(routes.getByRole('link', { name: /Work/ })).toHaveAttribute('href', '/work/');
     await expect(routes.getByRole('link', { name: /Journey/ })).toHaveAttribute('href', '/journey/');
     await expect(routes.getByRole('link', { name: /Profile/ })).toHaveAttribute('href', '/profile/');
+    await expect(rail.getByRole('link', { name: /Ask the verified guide/ })).toHaveAttribute('href', '/guide/');
+  });
+
+  test('keeps analytics disabled on local previews', async ({ page }) => {
+    await expect(page.locator('script[src="https://gc.zgo.at/count.js"]')).toHaveCount(0);
   });
 
   test('publishes metadata and machine-readable discovery files', async ({ page }) => {
@@ -105,10 +111,78 @@ test.describe('mobile route navigation', () => {
     await expect(navigation.getByRole('link', { name: 'Work' })).toHaveAttribute('href', '/work/');
     await expect(navigation.getByRole('link', { name: 'Journey' })).toHaveAttribute('href', '/journey/');
     await expect(navigation.getByRole('link', { name: 'Profile' })).toHaveAttribute('href', '/profile/');
+    await expect(navigation.getByRole('link', { name: 'Guide' })).toHaveAttribute('href', '/guide/');
 
     await navigation.getByRole('link', { name: 'Work' }).click();
     await expect(page).toHaveURL(/\/work\/$/);
     await expect(page.getByRole('heading', { level: 1 })).toHaveText(/Systems with decisions/);
+  });
+});
+
+test.describe('verified portfolio guide', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/guide/');
+  });
+
+  test('matches suggested and typed questions to published answers', async ({ page }) => {
+    await expect(page).toHaveTitle('Verified portfolio guide | Phadima Percival Maredi');
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText(/Ask a focused question/);
+    await expect(page.getByText('Verified mode', { exact: true })).toBeVisible();
+    await expect(page.getByText(/does not generate new claims/i)).toBeVisible();
+
+    await page.getByRole('link', { name: 'What kind of engineer is Phadima?' }).click();
+    await expect(page.getByRole('heading', { name: 'Full-stack range with back-end depth' })).toBeVisible();
+    await expect(page.getByRole('status')).toHaveText(/Showing .* verified answer/);
+
+    const query = page.getByLabel('What would you like to know?');
+    await query.fill('What cloud and delivery experience does Phadima have?');
+    await page.getByRole('button', { name: 'Find an answer' }).click();
+    await expect(page.locator('[data-guide-answer]:visible').first()).toHaveAttribute(
+      'data-guide-answer',
+      'cloud-delivery'
+    );
+    await expect(page.getByRole('heading', { name: 'Cloud delivery backed by operational work' })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Career and cloud capabilities' })).toHaveAttribute(
+      'href',
+      '/journey/'
+    );
+  });
+
+  test('shows no-result and reset states without inventing an answer', async ({ page }) => {
+    const query = page.getByLabel('What would you like to know?');
+    await query.fill('quantum gardening');
+    await page.getByRole('button', { name: 'Find an answer' }).click();
+
+    await expect(page.getByRole('heading', { name: 'Try a different question.' })).toBeVisible();
+    await expect(page.getByRole('status')).toHaveText(/No verified answer matched/);
+    await expect(page.locator('[data-guide-answer]:visible')).toHaveCount(0);
+
+    await page.getByRole('button', { name: 'Clear question' }).click();
+    await expect(page.getByRole('heading', { name: 'Choose what you want to know.' })).toBeVisible();
+    await expect(page.getByRole('status')).toHaveText(/Verified guide ready/);
+  });
+
+  test('remains accessible and contained at desktop and 320 pixels', async ({ page }) => {
+    await expectAccessibleAndContained(page);
+    await page.setViewportSize({ width: 320, height: 800 });
+    await expectAccessibleAndContained(page);
+  });
+
+  test('keeps every answer available without JavaScript', async ({ browser }) => {
+    const context = await browser.newContext({
+      baseURL: 'http://127.0.0.1:4321',
+      javaScriptEnabled: false,
+    });
+    const page = await context.newPage();
+
+    try {
+      await page.goto('/guide/');
+      await expect(page.locator('[data-guide-answer]')).toHaveCount(9);
+      await expect(page.getByRole('heading', { name: 'Start with Missing Children SA' })).toBeVisible();
+      await expect(page.getByText(/All verified answers remain available/i)).toBeVisible();
+    } finally {
+      await context.close();
+    }
   });
 });
 

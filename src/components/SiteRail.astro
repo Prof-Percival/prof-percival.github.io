@@ -9,6 +9,7 @@ interface Props {
 }
 
 const { active } = Astro.props;
+const primaryRoutes = portfolioRoutes.filter((route) => route.id !== 'guide');
 ---
 
 <aside class="site-rail" aria-label="Portfolio navigation">
@@ -28,7 +29,7 @@ const { active } = Astro.props;
   </a>
 
   <nav class="rail-nav" aria-label="Portfolio routes">
-    {portfolioRoutes.map((route) => (
+    {primaryRoutes.map((route) => (
       <a href={route.href} aria-current={active === route.id ? 'page' : undefined}>
         <span>{route.number}</span>
         <strong>{route.label}</strong>
@@ -36,6 +37,13 @@ const { active } = Astro.props;
       </a>
     ))}
   </nav>
+
+  <div class="rail-guide">
+    <p>Need the short route?</p>
+    <a href="/guide/" aria-current={active === 'guide' ? 'page' : undefined}>
+      Ask the verified guide <ArrowIcon />
+    </a>
+  </div>
 
   <div class="rail-actions">
     <ThemeToggle />

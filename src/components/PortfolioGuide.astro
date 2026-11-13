@@ -1,0 +1,211 @@
+---
+import { guideAnswers, suggestedGuideAnswerIds, type GuideAnswer } from '../data/guide';
+import ArrowIcon from './ArrowIcon.astro';
+
+const suggestedAnswers = suggestedGuideAnswerIds
+  .map((id) => guideAnswers.find((answer) => answer.id === id))
+  .filter((answer): answer is GuideAnswer => answer !== undefined);
+---
+
+<section class="section guide-section shell" aria-labelledby="guide-tool-title">
+  <div class="guide-layout" data-portfolio-guide>
+    <div class="guide-console">
+      <header class="guide-console__header">
+        <p class="guide-mode">
+          <span aria-hidden="true"></span> Verified mode
+        </p>
+        <h2 id="guide-tool-title">Ask about the work.</h2>
+        <p id="guide-privacy">
+          This mode matches your question to published portfolio facts in your browser. It does not generate new claims
+          or send your question to an AI service.
+        </p>
+      </header>
+
+      <form class="guide-form" action="/guide/#verified-answers" method="get" data-guide-form>
+        <label for="guide-query">What would you like to know?</label>
+        <div class="guide-form__search">
+          <input
+            id="guide-query"
+            type="search"
+            maxlength="160"
+            autocomplete="off"
+            aria-describedby="guide-privacy guide-help"
+            placeholder="Ask about projects, experience, or skills"
+            data-guide-query
+          />
+          <button class="button button--primary" type="submit">
+            Find an answer <ArrowIcon />
+          </button>
+        </div>
+        <div class="guide-form__footer">
+          <p id="guide-help">Use a short question. Every answer links back to its published source.</p>
+          <button type="reset" data-guide-reset>
+            Clear question
+          </button>
+        </div>
+      </form>
+
+      <div class="guide-suggestions">
+        <h3>Suggested questions</h3>
+        <ul>
+          {suggestedAnswers.map((answer) => (
+            <li>
+              <a href={`#guide-answer-${answer.id}`} data-guide-prompt={answer.prompt}>
+                <span>{answer.prompt}</span>
+                <ArrowIcon />
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+
+    <div class="guide-output">
+      <p class="guide-status" role="status" aria-live="polite" aria-atomic="true" data-guide-status>
+        Verified guide ready. Choose a suggested question or type your own.
+      </p>
+
+      <div class="guide-empty" data-guide-empty>
+        <span aria-hidden="true">?</span>
+        <div>
+          <p class="eyebrow">No question selected</p>
+          <h2>Choose what you want to know.</h2>
+          <p>Start with a suggested question, or search the published portfolio in your own words.</p>
+        </div>
+      </div>
+
+      <div class="guide-no-results" data-guide-no-results hidden>
+        <p class="eyebrow">No verified match</p>
+        <h2>Try a different question.</h2>
+        <p>
+          Ask about projects, experience, back-end skills, cloud work, data, education, languages, or contact options.
+        </p>
+      </div>
+
+      <section class="guide-library" id="verified-answers" aria-labelledby="verified-answers-title" data-guide-library>
+        <header class="guide-library__header">
+          <p class="eyebrow">Verified answer library</p>
+          <h2 id="verified-answers-title">Published facts, linked to their source.</h2>
+        </header>
+        <div class="guide-answer-list" data-guide-answer-list>
+          {guideAnswers.map((answer, index) => (
+            <article class="guide-answer" id={`guide-answer-${answer.id}`} data-guide-answer={answer.id}>
+              <span class="guide-answer__index" aria-hidden="true">
+                {String(index + 1).padStart(2, '0')}
+              </span>
+              <div>
+                <h3>{answer.title}</h3>
+                <p>{answer.answer}</p>
+                <a class="text-link" href={answer.sourceHref} data-track="guide-source">
+                  {answer.sourceLabel} <ArrowIcon />
+                </a>
+              </div>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <noscript>
+        <p class="guide-noscript">
+          Interactive matching needs JavaScript. All verified answers remain available in the answer library above.
+        </p>
+      </noscript>
+    </div>
+  </div>
+</section>
+
+<script>
+  import { findGuideAnswers } from '../data/guide';
+
+  const guides = document.querySelectorAll<HTMLElement>('[data-portfolio-guide]');
+
+  guides.forEach((guide) => {
+    const form = guide.querySelector<HTMLFormElement>('[data-guide-form]');
+    const input = guide.querySelector<HTMLInputElement>('[data-guide-query]');
+    const status = guide.querySelector<HTMLElement>('[data-guide-status]');
+    const empty = guide.querySelector<HTMLElement>('[data-guide-empty]');
+    const noResults = guide.querySelector<HTMLElement>('[data-guide-no-results]');
+    const library = guide.querySelector<HTMLElement>('[data-guide-library]');
+    const answerList = guide.querySelector<HTMLElement>('[data-guide-answer-list]');
+    const answerCards = Array.from(guide.querySelectorAll<HTMLElement>('[data-guide-answer]'));
+    const promptLinks = guide.querySelectorAll<HTMLAnchorElement>('[data-guide-prompt]');
+
+    if (!form || !input || !status || !empty || !noResults || !library || !answerList) return;
+
+    const answerCardsById = new Map<string, HTMLElement>();
+    answerCards.forEach((card) => {
+      if (card.dataset.guideAnswer) answerCardsById.set(card.dataset.guideAnswer, card);
+    });
+
+    const resetGuide = () => {
+      answerCards.forEach((card) => {
+        card.hidden = true;
+        answerList.append(card);
+      });
+      library.hidden = true;
+      noResults.hidden = true;
+      empty.hidden = false;
+      status.dataset.state = 'empty';
+      status.textContent = 'Verified guide ready. Choose a suggested question or type your own.';
+    };
+
+    const showAnswers = (question: string) => {
+      const normalizedQuestion = question.trim();
+      if (!normalizedQuestion) {
+        resetGuide();
+        return;
+      }
+
+      const results = findGuideAnswers(normalizedQuestion);
+      const resultIds = new Set<string>(results.map((answer) => answer.id));
+      results.forEach((answer) => {
+        const card = answerCardsById.get(answer.id);
+        if (card) answerList.append(card);
+      });
+      answerCards.forEach((card) => {
+        card.hidden = !resultIds.has(card.dataset.guideAnswer ?? '');
+        if (card.hidden) answerList.append(card);
+      });
+      empty.hidden = true;
+
+      if (results.length === 0) {
+        library.hidden = true;
+        noResults.hidden = false;
+        status.dataset.state = 'no-results';
+        status.textContent = `No verified answer matched ${normalizedQuestion}.`;
+        return;
+      }
+
+      noResults.hidden = true;
+      library.hidden = false;
+      status.dataset.state = 'results';
+      status.textContent = `Showing ${results.length} verified ${results.length === 1 ? 'answer' : 'answers'} for ${normalizedQuestion}.`;
+    };
+
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+      showAnswers(input.value);
+    });
+
+    form.addEventListener('reset', () => {
+      window.setTimeout(resetGuide, 0);
+    });
+
+    promptLinks.forEach((link) => {
+      link.addEventListener('click', (event) => {
+        event.preventDefault();
+        input.value = link.dataset.guidePrompt ?? '';
+        showAnswers(input.value);
+      });
+    });
+
+    guide.dataset.enhanced = 'true';
+    const initialQuestion = new URL(window.location.href).searchParams.get('question')?.trim();
+    if (initialQuestion) {
+      input.value = initialQuestion.slice(0, 160);
+      showAnswers(input.value);
+    } else {
+      resetGuide();
+    }
+  });
+</script>
