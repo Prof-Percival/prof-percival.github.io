@@ -1,0 +1,28 @@
+---
+interface PageIndexItem {
+  href: `#${string}`;
+  label: string;
+}
+
+interface Props {
+  label: string;
+  items: readonly PageIndexItem[];
+  eyebrow?: string;
+}
+
+const { label, items, eyebrow = 'On this page' } = Astro.props;
+---
+
+<nav class="page-index shell" aria-label={label}>
+  <span class="page-index__label">{eyebrow}</span>
+  <ol>
+    {items.map((item, index) => (
+      <li>
+        <a href={item.href}>
+          <span>{String(index + 1).padStart(2, '0')}</span>
+          {item.label}
+        </a>
+      </li>
+    ))}
+  </ol>
+</nav>

@@ -4,6 +4,7 @@ import AgentRiskVisual from '../../components/AgentRiskVisual.astro';
 import AppShell from '../../components/AppShell.astro';
 import ArrowIcon from '../../components/ArrowIcon.astro';
 import CaseStudyDeck from '../../components/CaseStudyDeck.astro';
+import PageIndex from '../../components/PageIndex.astro';
 import { agentRiskMonitorCaseStudy as project } from '../../data/flagships';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 ---
@@ -15,7 +16,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
   <AppShell active="work">
     <main id="main">
       <article class="case-study case-study--agent">
-        <header class="case-study__hero shell">
+        <header id="case-overview" class="case-study__hero shell indexed-section">
           <a class="text-link case-study__back" href="/work/">
             <ArrowIcon direction="left" /> Back to flagship systems
           </a>
@@ -38,13 +39,24 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
           </ul>
         </header>
 
+        <PageIndex
+          label="Agent Activity Risk Monitor sections"
+          eyebrow="Case study map"
+          items={[
+            { href: '#case-overview', label: 'Overview' },
+            { href: '#agent-guide', label: 'Guided story' },
+            { href: '#agent-demo', label: 'Synthetic pipeline' },
+            { href: '#engineering-details', label: 'Engineering details' },
+          ]}
+        />
+
         <div class="case-study__visual shell">
           <AgentRiskVisual />
         </div>
         <CaseStudyDeck idPrefix="agent" title="Follow one event across two services." chapters={project.chapters} />
         <AgentRiskPipeline />
 
-        <div class="case-study__body shell">
+        <div id="engineering-details" class="case-study__body shell indexed-section">
           <section aria-labelledby="agent-challenge-title">
             <p class="eyebrow">01 / Engineering problem</p>
             <h2 id="agent-challenge-title">Retries and concurrency cannot change the evidence.</h2>

@@ -1,6 +1,7 @@
 ---
 import AppShell from '../../components/AppShell.astro';
 import ArrowIcon from '../../components/ArrowIcon.astro';
+import PageIndex from '../../components/PageIndex.astro';
 import ShelfIqVisual from '../../components/ShelfIqVisual.astro';
 import ShelfIqWorkflow from '../../components/ShelfIqWorkflow.astro';
 import { shelfIqProject as project } from '../../data/shelfiq';
@@ -14,7 +15,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
   <AppShell active="work">
     <main id="main">
       <article class="case-study case-study--shelfiq">
-        <header class="case-study__hero shell">
+        <header id="case-overview" class="case-study__hero shell indexed-section">
           <a class="text-link case-study__back" href="/work/">
             <ArrowIcon direction="left" /> Back to work
           </a>
@@ -33,12 +34,23 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
           </ul>
         </header>
 
+        <PageIndex
+          label="ShelfIQ sections"
+          eyebrow="Project map"
+          items={[
+            { href: '#case-overview', label: 'Overview' },
+            { href: '#shelfiq-product-path', label: 'Product path' },
+            { href: '#engineering-details', label: 'Engineering details' },
+            { href: '#release-gates', label: 'Release gates' },
+          ]}
+        />
+
         <div class="case-study__visual shell">
           <ShelfIqVisual />
         </div>
         <ShelfIqWorkflow />
 
-        <div class="case-study__body shell">
+        <div id="engineering-details" class="case-study__body shell indexed-section">
           <section aria-labelledby="shelfiq-problem-title">
             <p class="eyebrow">01 / Product problem</p>
             <h2 id="shelfiq-problem-title">Expiry awareness starts with a trustworthy product record.</h2>
@@ -70,7 +82,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
             </ul>
           </section>
 
-          <section aria-labelledby="shelfiq-delivery-title">
+          <section id="release-gates" class="indexed-section" aria-labelledby="shelfiq-delivery-title">
             <p class="eyebrow">04 / Before public release</p>
             <h2 id="shelfiq-delivery-title">Four engineering gates remain before public release.</h2>
             <p>No launch, customer usage, or production outcome is claimed. These are the next engineering gates.</p>

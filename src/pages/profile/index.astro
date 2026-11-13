@@ -3,13 +3,14 @@ import About from '../../components/About.astro';
 import AppShell from '../../components/AppShell.astro';
 import Capabilities from '../../components/Capabilities.astro';
 import ContactForm from '../../components/ContactForm.astro';
+import PageIndex from '../../components/PageIndex.astro';
 import RouteHero from '../../components/RouteHero.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 ---
 
 <BaseLayout
   title="Profile | Phadima Percival Maredi"
-  description="Capabilities, education, credentials, languages, community work, CV, and contact details for software engineer Phadima Percival Maredi."
+  description="Capabilities, education, certifications, languages, community work, CV, and contact details for software engineer Phadima Percival Maredi."
 >
   <AppShell active="profile">
     <main id="main" class="route-page profile-route">
@@ -21,10 +22,21 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
       >
         <div class="route-hero__facts" aria-label="Profile route summary">
           <span>Software Engineer</span>
-          <span>100+ completed credentials</span>
+          <span>100+ completed certifications</span>
           <span>Six working languages</span>
         </div>
       </RouteHero>
+      <PageIndex
+        label="Profile sections"
+        items={[
+          { href: '#capabilities', label: 'Capabilities' },
+          { href: '#about', label: 'About' },
+          { href: '#credentials', label: 'Certifications' },
+          { href: '#languages', label: 'Languages' },
+          { href: '#community', label: 'Community' },
+          { href: '#contact', label: 'Contact' },
+        ]}
+      />
       <Capabilities number="01" />
       <About number="02" />
       <ContactForm number="03" />

@@ -11,7 +11,7 @@ interface Props {
 const { idPrefix, title, chapters } = Astro.props;
 ---
 
-<section class="case-deck shell" aria-labelledby={`${idPrefix}-deck-title`}>
+<section id={`${idPrefix}-guide`} class="case-deck shell indexed-section" aria-labelledby={`${idPrefix}-deck-title`}>
   <header class="case-deck__header">
     <p class="eyebrow">Guided case study</p>
     <h2 id={`${idPrefix}-deck-title`}>{title}</h2>
