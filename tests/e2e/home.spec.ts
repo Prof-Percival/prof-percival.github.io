@@ -280,7 +280,7 @@ test.describe('verified portfolio guide', () => {
 
     try {
       await page.goto('/guide/');
-      await expect(page.locator('[data-guide-answer]')).toHaveCount(11);
+      await expect(page.locator('[data-guide-answer]')).toHaveCount(12);
       await expect(page.getByRole('heading', { name: 'Start with Missing Children SA' })).toBeVisible();
       await expect(page.getByText(/All verified answers remain available/i)).toBeVisible();
     } finally {
@@ -307,6 +307,12 @@ test.describe('work route', () => {
     await expect(page.getByRole('heading', { name: 'Missing Children SA' })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Fraud Rule Engine' })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Agent Activity Risk Monitor' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'ShelfIQ', exact: true })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Explore the ShelfIQ story' })).toHaveAttribute(
+      'href',
+      '/work/shelfiq/'
+    );
+    await expect(page.getByText('Not publicly launched', { exact: true })).toBeVisible();
 
     for (const title of [
       'SIC Data Analysis and Visualization',
@@ -426,6 +432,39 @@ test.describe('Agent Activity Risk Monitor case study', () => {
 
     await page.locator('[data-agent-stage]').filter({ hasText: 'Alert' }).click();
     await expect(page.locator('[data-agent-stage-detail]')).toHaveText(/written once.*unique/);
+  });
+
+  test('is accessible and contained', async ({ page }) => {
+    await expectAccessibleAndContained(page);
+  });
+});
+
+test.describe('ShelfIQ project story', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/work/shelfiq/');
+  });
+
+  test('states what exists and what remains before launch', async ({ page }) => {
+    await expect(page).toHaveTitle(/ShelfIQ.*In-development project.*Phadima Percival Maredi/);
+    await expect(page.getByRole('heading', { level: 1, name: 'ShelfIQ' })).toBeVisible();
+    await expect(page.getByText('In development', { exact: true })).toBeVisible();
+    await expect(page.getByText('Private source', { exact: true })).toBeVisible();
+    await expect(page.getByText('Not publicly launched', { exact: true })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Protect the core rules with automated tests' })).toBeVisible();
+    await expect(page.getByText(/No launch, customer usage, or production outcome is claimed/)).toBeVisible();
+  });
+
+  test('lets visitors inspect the implemented product boundaries', async ({ page }) => {
+    const workflow = page.locator('[data-shelfiq-workflow]');
+    await workflow.getByRole('button', { name: /Verify/ }).click();
+    await expect(
+      workflow.getByRole('heading', { name: 'Resolve a barcode and retain the useful result.' })
+    ).toBeVisible();
+    await expect(workflow.locator('[data-shelfiq-boundary]')).toHaveText(/public lookup exposes product verification/);
+    await expect(workflow.getByRole('status')).toHaveText('Verify stage selected.');
+
+    await workflow.getByRole('button', { name: /Media/ }).click();
+    await expect(workflow.locator('[data-shelfiq-boundary]')).toHaveText(/no original ShelfIQ media has been cleared/);
   });
 
   test('is accessible and contained', async ({ page }) => {

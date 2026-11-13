@@ -5041,3 +5041,479 @@
     animation: none;
   }
 }
+
+@layer components {
+  .development-work {
+    border-bottom: 1px solid var(--line);
+  }
+
+  .development-project {
+    display: grid;
+    grid-template-columns: minmax(20rem, 0.78fr) minmax(28rem, 1.22fr);
+    gap: clamp(2rem, 5vw, 5rem);
+    align-items: center;
+    padding: clamp(1.2rem, 3vw, 2.25rem);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    background: radial-gradient(circle at 12% 18%, var(--accent-soft), transparent 18rem), var(--surface-soft);
+    box-shadow: inset 0 1px 0 #ffffff08;
+  }
+
+  .development-project__copy {
+    padding: clamp(0.4rem, 2vw, 1.5rem);
+  }
+
+  .development-project__status {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 1.25rem;
+  }
+
+  .development-project__status span {
+    padding: 0.4rem 0.65rem;
+    border: 1px solid var(--signal);
+    border-radius: 100px;
+    color: var(--signal);
+    font-family: var(--font-mono);
+    font-size: 0.5rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  .development-project__status span:last-child {
+    border-color: var(--line-strong);
+    color: var(--muted);
+  }
+
+  .development-project h3 {
+    max-width: 12ch;
+    margin-top: 1.4rem;
+    font-size: clamp(3rem, 5.5vw, 5.4rem);
+  }
+
+  .development-project__lead {
+    margin-top: 1.4rem;
+    color: var(--muted-strong);
+    font-size: 1rem;
+  }
+
+  .atlas-evidence {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    padding: 0;
+    margin: 1.5rem 0 0;
+    list-style: none;
+  }
+
+  .atlas-evidence li {
+    padding: 0.45rem 0.65rem;
+    border: 1px solid var(--line);
+    border-radius: 100px;
+    color: var(--muted-strong);
+    font-family: var(--font-mono);
+    font-size: 0.5rem;
+  }
+
+  .shelfiq-visual {
+    position: relative;
+    display: grid;
+    min-height: 34rem;
+    align-content: space-between;
+    gap: 2rem;
+    overflow: hidden;
+    padding: clamp(1.25rem, 3vw, 2rem);
+    border: 1px solid var(--line-strong);
+    border-radius: calc(var(--radius-lg) - 0.35rem);
+    background:
+      radial-gradient(circle at 58% 48%, var(--accent-soft), transparent 40%),
+      linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px),
+      var(--page);
+    background-size:
+      auto,
+      2.5rem 2.5rem,
+      2.5rem 2.5rem,
+      auto;
+  }
+
+  .shelfiq-visual__header,
+  .shelfiq-visual__footer {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .shelfiq-visual__header span,
+  .shelfiq-visual__footer span,
+  .shelfiq-visual__product span,
+  .shelfiq-visual__status span,
+  .shelfiq-visual__status small,
+  .shelfiq-visual__nodes span {
+    color: var(--muted);
+    font-family: var(--font-mono);
+    font-size: 0.5rem;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+  }
+
+  .shelfiq-visual__header strong {
+    color: var(--muted-strong);
+    font-size: 0.72rem;
+  }
+
+  .shelfiq-visual__body {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: minmax(8rem, 1fr) minmax(8rem, 0.9fr) minmax(8rem, 1fr);
+    align-items: center;
+    gap: 1.25rem;
+  }
+
+  .shelfiq-visual__product,
+  .shelfiq-visual__status,
+  .shelfiq-visual__nodes > div {
+    padding: 1rem;
+    border: 1px solid var(--line-strong);
+    border-radius: 0.9rem;
+    background: var(--surface-raised);
+    box-shadow: 0 1.2rem 3rem #00000026;
+  }
+
+  .shelfiq-visual__product {
+    display: grid;
+    gap: 0.55rem;
+  }
+
+  .shelfiq-visual__product strong,
+  .shelfiq-visual__status strong,
+  .shelfiq-visual__nodes strong {
+    color: var(--text-strong);
+    font-size: 0.78rem;
+  }
+
+  .shelfiq-visual__product i {
+    display: inline-block;
+    width: 0.22rem;
+    height: 2.5rem;
+    margin-right: 0.28rem;
+    background: var(--muted-strong);
+  }
+
+  .shelfiq-visual__product i:nth-of-type(2n) {
+    width: 0.45rem;
+  }
+
+  .shelfiq-visual__status {
+    display: grid;
+    gap: 0.55rem;
+    border-color: var(--accent);
+    text-align: center;
+  }
+
+  .shelfiq-visual__status strong {
+    color: var(--accent);
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    line-height: 1;
+  }
+
+  .shelfiq-visual__nodes {
+    display: grid;
+    gap: 0.65rem;
+  }
+
+  .shelfiq-visual__nodes > div {
+    display: grid;
+    gap: 0.3rem;
+  }
+
+  .case-study__visual > .shelfiq-visual {
+    min-height: 42rem;
+  }
+
+  .case-study--shelfiq .case-study__badges span:first-child {
+    border-color: var(--signal);
+    color: var(--signal);
+  }
+
+  .case-study--shelfiq .case-study__badges span:last-child {
+    border-color: var(--line-strong);
+    color: var(--muted);
+  }
+
+  .shelfiq-workflow {
+    padding-block: var(--section-space);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .shelfiq-workflow__header {
+    display: grid;
+    grid-template-columns: minmax(20rem, 1.1fr) minmax(18rem, 0.55fr);
+    align-items: end;
+    gap: clamp(2rem, 8vw, 8rem);
+    margin-bottom: clamp(2.5rem, 6vw, 5rem);
+  }
+
+  .shelfiq-workflow__header h2 {
+    margin-top: 1.2rem;
+    font-size: clamp(2.7rem, 5vw, 5rem);
+  }
+
+  .shelfiq-workflow__header > p {
+    color: var(--muted-strong);
+  }
+
+  .shelfiq-workflow__workspace {
+    display: grid;
+    grid-template-columns: minmax(18rem, 0.72fr) minmax(0, 1.28fr);
+    gap: 1px;
+    overflow: hidden;
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius-lg);
+    background: var(--line);
+  }
+
+  .shelfiq-workflow__tabs {
+    display: grid;
+    grid-column: 1 / -1;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 1px;
+    background: var(--line);
+  }
+
+  .shelfiq-workflow__tabs button {
+    display: grid;
+    min-height: 4rem;
+    grid-template-columns: auto 1fr;
+    align-items: center;
+    gap: 0.65rem;
+    padding: 0.75rem 1rem;
+    border: 0;
+    background: var(--page);
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 0.7rem;
+    font-weight: 700;
+  }
+
+  .shelfiq-workflow__tabs button span {
+    color: var(--signal);
+    font-family: var(--font-mono);
+    font-size: 0.48rem;
+  }
+
+  .shelfiq-workflow__tabs button[aria-pressed='true'] {
+    background: var(--accent-soft);
+    color: var(--text-strong);
+    box-shadow: inset 0 -2px var(--accent);
+  }
+
+  .shelfiq-workflow__diagram {
+    display: grid;
+    min-height: 31rem;
+    align-content: center;
+    gap: 0.65rem;
+    padding: clamp(1.25rem, 4vw, 3rem);
+    background:
+      linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px),
+      var(--page);
+    background-size:
+      2.5rem 2.5rem,
+      2.5rem 2.5rem,
+      auto;
+  }
+
+  .shelfiq-workflow__diagram > div {
+    display: grid;
+    gap: 0.3rem;
+    padding: 0.85rem;
+    border: 1px solid var(--line-strong);
+    border-radius: 0.7rem;
+    background: var(--surface-raised);
+    opacity: 0.5;
+  }
+
+  .shelfiq-workflow__diagram > i {
+    width: 1px;
+    height: 1rem;
+    margin-left: 1.25rem;
+    background: var(--line-strong);
+  }
+
+  .shelfiq-workflow__diagram > div span {
+    color: var(--muted);
+    font-family: var(--font-mono);
+    font-size: 0.46rem;
+    text-transform: uppercase;
+  }
+
+  .shelfiq-workflow__diagram > div strong {
+    color: var(--muted-strong);
+    font-size: 0.72rem;
+  }
+
+  .shelfiq-workflow__diagram[data-stage='capture'] > div:nth-of-type(1),
+  .shelfiq-workflow__diagram[data-stage='monitor'] > div:nth-of-type(2),
+  .shelfiq-workflow__diagram[data-stage='verify'] > div:nth-of-type(3),
+  .shelfiq-workflow__diagram[data-stage='media'] > div:nth-of-type(4) {
+    border-color: var(--accent);
+    opacity: 1;
+    box-shadow: 0 0 0 0.3rem var(--accent-soft);
+  }
+
+  .shelfiq-workflow__detail {
+    display: grid;
+    min-height: 31rem;
+    align-content: center;
+    gap: 1.2rem;
+    padding: clamp(1.5rem, 4vw, 3.5rem);
+    background: radial-gradient(circle at 80% 15%, var(--accent-soft), transparent 16rem), var(--surface-soft);
+  }
+
+  .shelfiq-workflow__detail h3 {
+    max-width: 16ch;
+    font-size: clamp(2.2rem, 4.5vw, 4rem);
+  }
+
+  .shelfiq-workflow__detail > p:not(.eyebrow, .form-status) {
+    color: var(--muted-strong);
+  }
+
+  .shelfiq-workflow__detail > div {
+    display: grid;
+    gap: 0.45rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--line);
+  }
+
+  .shelfiq-workflow__detail > div span {
+    color: var(--muted);
+    font-family: var(--font-mono);
+    font-size: 0.5rem;
+    text-transform: uppercase;
+  }
+
+  .shelfiq-workflow__detail > div strong {
+    color: var(--accent);
+    font-size: 0.76rem;
+  }
+
+  .surface-grid--four {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .shelfiq-capabilities {
+    display: grid;
+    grid-column: 1 / -1;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1px;
+    padding: 1px;
+    margin: 2rem 0 0;
+    background: var(--line);
+    list-style: none;
+  }
+
+  .shelfiq-capabilities li {
+    min-height: 7rem;
+    padding: 1.25rem;
+    background: var(--surface-soft);
+    color: var(--muted-strong);
+    font-size: 0.82rem;
+  }
+
+  .shelfiq-capabilities li::before {
+    display: block;
+    width: 0.55rem;
+    height: 0.55rem;
+    margin-bottom: 1rem;
+    border-radius: 50%;
+    background: var(--signal);
+    box-shadow: 0 0 0 0.25rem var(--signal-soft);
+    content: '';
+  }
+
+  .shelfiq-delivery-list {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 62rem) {
+  .development-project,
+  .shelfiq-workflow__header,
+  .shelfiq-workflow__workspace {
+    grid-template-columns: 1fr;
+  }
+
+  .shelfiq-workflow__tabs {
+    grid-column: 1;
+  }
+
+  .surface-grid--four {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 43rem) {
+  .development-project {
+    padding: 1rem;
+    border-radius: var(--radius);
+  }
+
+  .development-project__copy {
+    padding: 0.35rem;
+  }
+
+  .development-project h3 {
+    font-size: clamp(3rem, 15vw, 4.5rem);
+  }
+
+  .shelfiq-visual,
+  .case-study__visual > .shelfiq-visual {
+    min-height: 31rem;
+    padding: 1rem;
+  }
+
+  .shelfiq-visual__body {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .shelfiq-visual__product {
+    grid-row: span 2;
+  }
+
+  .shelfiq-visual__nodes {
+    grid-column: 2;
+  }
+
+  .shelfiq-visual__footer {
+    flex-wrap: wrap;
+  }
+
+  .shelfiq-workflow__header h2 {
+    font-size: clamp(2.7rem, 12vw, 4rem);
+  }
+
+  .shelfiq-workflow__tabs {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .shelfiq-workflow__workspace {
+    border-radius: var(--radius);
+  }
+
+  .shelfiq-workflow__diagram,
+  .shelfiq-workflow__detail {
+    min-height: auto;
+    padding: 1.25rem;
+  }
+
+  .surface-grid--four,
+  .shelfiq-capabilities {
+    grid-template-columns: 1fr;
+  }
+}

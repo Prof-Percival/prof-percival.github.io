@@ -1,0 +1,102 @@
+---
+import { selectShelfIqWorkflowStep, shelfIqWorkflow } from '../data/shelfiq';
+
+const initial = selectShelfIqWorkflowStep('capture');
+---
+
+<section class="shelfiq-workflow shell" aria-labelledby="shelfiq-workflow-title">
+  <header class="shelfiq-workflow__header">
+    <div>
+      <p class="eyebrow">Interactive product path</p>
+      <h2 id="shelfiq-workflow-title">Follow one product through the current system.</h2>
+    </div>
+    <p>The explorer reflects implemented source boundaries. It does not represent a publicly running product.</p>
+  </header>
+
+  <div class="shelfiq-workflow__workspace" data-shelfiq-workflow>
+    <div class="shelfiq-workflow__tabs" role="group" aria-label="ShelfIQ workflow stage">
+      {shelfIqWorkflow.map((step, index) => (
+        <button type="button" data-shelfiq-step={step.id} aria-pressed={index === 0 ? 'true' : 'false'}>
+          <span>{String(index + 1).padStart(2, '0')}</span>
+          {step.label}
+        </button>
+      ))}
+    </div>
+    <div class="shelfiq-workflow__diagram" data-stage={initial.id} aria-hidden="true">
+      <div>
+        <span>Product</span>
+        <strong>Barcode + dates</strong>
+      </div>
+      <i></i>
+      <div>
+        <span>Status</span>
+        <strong>Fresh / Soon / Expired</strong>
+      </div>
+      <i></i>
+      <div>
+        <span>Lookup</span>
+        <strong>Stored before remote</strong>
+      </div>
+      <i></i>
+      <div>
+        <span>Image</span>
+        <strong>Reference + blob</strong>
+      </div>
+    </div>
+    <article class="shelfiq-workflow__detail">
+      <p class="eyebrow" data-shelfiq-owner>
+        {initial.owner}
+      </p>
+      <h3 data-shelfiq-title>{initial.title}</h3>
+      <p data-shelfiq-detail>{initial.detail}</p>
+      <div>
+        <span>Boundary</span>
+        <strong data-shelfiq-boundary>{initial.boundary}</strong>
+      </div>
+      <p class="form-status" role="status" aria-live="polite" aria-atomic="true" data-shelfiq-status>
+        Capture stage selected.
+      </p>
+    </article>
+  </div>
+
+  <noscript>
+    <div class="case-deck__noscript">
+      {shelfIqWorkflow.map((step) => (
+        <p>
+          <strong>{step.label}:</strong> {step.detail}
+        </p>
+      ))}
+    </div>
+  </noscript>
+</section>
+
+<script>
+  import { selectShelfIqWorkflowStep } from '../data/shelfiq';
+
+  document.querySelectorAll<HTMLElement>('[data-shelfiq-workflow]').forEach((workflow) => {
+    const buttons = Array.from(workflow.querySelectorAll<HTMLButtonElement>('[data-shelfiq-step]'));
+    const diagram = workflow.querySelector<HTMLElement>('.shelfiq-workflow__diagram');
+    const owner = workflow.querySelector<HTMLElement>('[data-shelfiq-owner]');
+    const title = workflow.querySelector<HTMLElement>('[data-shelfiq-title]');
+    const detail = workflow.querySelector<HTMLElement>('[data-shelfiq-detail]');
+    const boundary = workflow.querySelector<HTMLElement>('[data-shelfiq-boundary]');
+    const status = workflow.querySelector<HTMLElement>('[data-shelfiq-status]');
+    if (!diagram || !owner || !title || !detail || !boundary || !status) return;
+
+    const select = (id: string) => {
+      const step = selectShelfIqWorkflowStep(id);
+      buttons.forEach((button) => button.setAttribute('aria-pressed', String(button.dataset.shelfiqStep === step.id)));
+      diagram.dataset.stage = step.id;
+      owner.textContent = step.owner;
+      title.textContent = step.title;
+      detail.textContent = step.detail;
+      boundary.textContent = step.boundary;
+      status.textContent = `${step.label} stage selected.`;
+    };
+
+    buttons.forEach((button) =>
+      button.addEventListener('click', () => select(button.dataset.shelfiqStep ?? 'capture'))
+    );
+    select('capture');
+  });
+</script>

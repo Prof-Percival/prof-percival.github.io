@@ -1,6 +1,7 @@
 ---
 import AppShell from '../../components/AppShell.astro';
 import EarlierWork from '../../components/EarlierWork.astro';
+import InDevelopmentWork from '../../components/InDevelopmentWork.astro';
 import RouteHero from '../../components/RouteHero.astro';
 import SelectedWork from '../../components/SelectedWork.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
@@ -19,13 +20,14 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
         introduction="Start with the flagship systems, then move through product work, data, desktop software, and low-level foundations. Each project earns its place through a distinct engineering decision or working interaction."
       >
         <div class="route-hero__facts" aria-label="Work route summary">
-          <span>Flagship systems</span>
-          <span>Interactive labs</span>
-          <span>Private source handled honestly</span>
+          <span>Three flagship systems</span>
+          <span>ShelfIQ in development</span>
+          <span>Five earlier projects</span>
         </div>
       </RouteHero>
       <SelectedWork />
-      <EarlierWork />
+      <InDevelopmentWork number="02" />
+      <EarlierWork number="03" />
     </main>
   </AppShell>
 </BaseLayout>

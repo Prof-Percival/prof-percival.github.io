@@ -1,0 +1,51 @@
+---
+import { shelfIqProject as project } from '../data/shelfiq';
+import ArrowIcon from './ArrowIcon.astro';
+import SectionHeading from './SectionHeading.astro';
+import ShelfIqVisual from './ShelfIqVisual.astro';
+
+interface Props {
+  number?: string;
+}
+
+const { number = '02' } = Astro.props;
+---
+
+<section class="section development-work shell" aria-labelledby="development-work-title">
+  <SectionHeading
+    number={number}
+    eyebrow="Product in development"
+    id="development-work-title"
+    title="A product taking shape, with the path to release made visible."
+    introduction="ShelfIQ has a real product model and implemented boundaries. Its public story separates what exists today from what still has to happen before release."
+  />
+
+  <article class="development-project">
+    <div class="development-project__copy">
+      <div class="project-meta">
+        <p class="project-index">{project.eyebrow}</p>
+        <span class="project-access">{project.sourceLabel}</span>
+      </div>
+      <div class="development-project__status">
+        <span>{project.status}</span>
+        <span>{project.launchLabel}</span>
+      </div>
+      <h3>{project.title}</h3>
+      <p class="development-project__lead">{project.summary}</p>
+      <ul class="atlas-evidence" aria-label="ShelfIQ current capabilities">
+        {project.capabilities.slice(0, 3).map((capability) => (
+          <li>{capability}</li>
+        ))}
+      </ul>
+      <ul class="tag-list" aria-label="ShelfIQ technologies">
+        {project.stack.slice(0, 6).map((item) => (
+          <li>{item}</li>
+        ))}
+      </ul>
+      <a class="text-link" href={`/work/${project.slug}/`} data-track="shelfiq-project-story">
+        Explore the ShelfIQ story <ArrowIcon />
+      </a>
+    </div>
+    <ShelfIqVisual />
+  </article>
+</section>

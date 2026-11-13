@@ -16,11 +16,17 @@ const images: Record<Exclude<EarlierProject['id'], 'sic'>, ImageMetadata> = {
   contacts: contactsImage,
   matrix: matrixImage,
 };
+
+interface Props {
+  number?: string;
+}
+
+const { number = '02' } = Astro.props;
 ---
 
 <section class="section earlier-work shell" aria-labelledby="earlier-work-title">
   <SectionHeading
-    number="02"
+    number={number}
     eyebrow="Earlier work"
     id="earlier-work-title"
     title="Range built one project at a time."
