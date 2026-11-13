@@ -158,30 +158,35 @@ export const education = [
 export const certifications = [
   {
     title: 'Java',
+    category: 'Back-end',
     issuer: 'Sololearn',
     issued: 'December 2022',
     url: 'https://www.sololearn.com/certificates/course/en/18637754/1068/landscape/png',
   },
   {
     title: 'Data Science Foundations, Level 1',
+    category: 'Data',
     issuer: 'IBM',
     issued: 'October 2022',
     url: 'https://www.credly.com/badges/2b3f0a66-b873-4f2c-819a-ccde0fc984c2/public_url',
   },
   {
     title: 'Data Science Tools',
+    category: 'Data',
     issuer: 'IBM',
     issued: 'October 2022',
     url: 'https://www.credly.com/badges/7e3a7c89-1926-439b-9244-461feab4f8dd/public_url',
   },
   {
     title: 'Python Essentials 1',
+    category: 'Back-end',
     issuer: 'Cisco Networking Academy',
     issued: 'July 2022',
     url: 'https://www.credly.com/badges/7aebd032-7b67-4209-b825-c93ddfc01188/public_url',
   },
   {
     title: 'Introduction to Cybersecurity',
+    category: 'Security',
     issuer: 'Cisco Networking Academy',
     issued: 'July 2021',
     url: 'https://www.credly.com/badges/4d6cfdb1-37c3-4d40-9cd4-ae86ffc62bba/public_url',

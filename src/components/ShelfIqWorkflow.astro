@@ -4,7 +4,11 @@ import { selectShelfIqWorkflowStep, shelfIqWorkflow } from '../data/shelfiq';
 const initial = selectShelfIqWorkflowStep('capture');
 ---
 
-<section class="shelfiq-workflow shell" aria-labelledby="shelfiq-workflow-title">
+<section
+  id="shelfiq-product-path"
+  class="shelfiq-workflow shell indexed-section"
+  aria-labelledby="shelfiq-workflow-title"
+>
   <header class="shelfiq-workflow__header">
     <div>
       <p class="eyebrow">Interactive product path</p>

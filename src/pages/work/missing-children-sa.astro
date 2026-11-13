@@ -4,6 +4,7 @@ import ArrowIcon from '../../components/ArrowIcon.astro';
 import CaseStudyDeck from '../../components/CaseStudyDeck.astro';
 import MissingChildrenVisual from '../../components/MissingChildrenVisual.astro';
 import MissingChildrenWorkflow from '../../components/MissingChildrenWorkflow.astro';
+import PageIndex from '../../components/PageIndex.astro';
 import { missingChildrenChapters } from '../../data/flagships';
 import { missingChildrenCaseStudy as project } from '../../data/portfolio';
 import BaseLayout from '../../layouts/BaseLayout.astro';
@@ -16,7 +17,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
   <AppShell active="work">
     <main id="main">
       <article class="case-study">
-        <header class="case-study__hero shell">
+        <header id="case-overview" class="case-study__hero shell indexed-section">
           <a class="text-link case-study__back" href="/work/">
             <ArrowIcon direction="left" /> Back to selected work
           </a>
@@ -34,6 +35,17 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
           </ul>
         </header>
 
+        <PageIndex
+          label="Missing Children SA sections"
+          eyebrow="Case study map"
+          items={[
+            { href: '#case-overview', label: 'Overview' },
+            { href: '#missing-children-guide', label: 'Guided story' },
+            { href: '#missing-children-demo', label: 'Interactive workflow' },
+            { href: '#engineering-details', label: 'Engineering details' },
+          ]}
+        />
+
         <div class="case-study__visual shell">
           <MissingChildrenVisual />
         </div>
@@ -45,7 +57,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
         />
         <MissingChildrenWorkflow />
 
-        <div class="case-study__body shell">
+        <div id="engineering-details" class="case-study__body shell indexed-section">
           <section aria-labelledby="challenge-title">
             <p class="eyebrow">01 / The challenge</p>
             <h2 id="challenge-title">Move quickly without skipping trust.</h2>

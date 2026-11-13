@@ -535,6 +535,18 @@ test.describe('profile route', () => {
     await expect(page).toHaveTitle('Profile | Phadima Percival Maredi');
     await expect(page.getByRole('heading', { level: 1 })).toHaveText(/Full-stack range/);
 
+    const pageIndex = page.getByRole('navigation', { name: 'Profile sections' });
+    for (const [label, href] of [
+      ['Capabilities', '#capabilities'],
+      ['About', '#about'],
+      ['Certifications', '#credentials'],
+      ['Languages', '#languages'],
+      ['Community', '#community'],
+      ['Contact', '#contact'],
+    ]) {
+      await expect(pageIndex.getByRole('link', { name: new RegExp(label) })).toHaveAttribute('href', href);
+    }
+
     for (const credential of [
       'Java',
       'Data Science Foundations, Level 1',
@@ -544,12 +556,39 @@ test.describe('profile route', () => {
     ]) {
       await expect(page.getByRole('link', { name: new RegExp(credential) })).toBeVisible();
     }
+    await expect(page.locator('.credential-card__category')).toHaveText([
+      'Back-end',
+      'Data',
+      'Data',
+      'Back-end',
+      'Security',
+    ]);
+
+    await pageIndex.getByRole('link', { name: /Languages/ }).click();
+    await expect(page).toHaveURL(/#languages$/);
+    await expect(page.locator('#languages')).toBeInViewport();
+
     for (const language of ['Sepedi', 'English', 'Sesotho', 'Setswana', 'IsiXhosa', 'IsiZulu']) {
       await expect(page.locator('.language-list dt').filter({ hasText: new RegExp(`^${language}$`) })).toBeVisible();
     }
     await expect(page.getByRole('heading', { name: 'Peer Buddy' })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Student Intern' })).toBeVisible();
     await expectAccessibleAndContained(page);
+  });
+
+  test('adapts credential cards to their available section width', async ({ page, isMobile }) => {
+    test.skip(isMobile, 'One desktop browser can exercise both container widths.');
+
+    const columnCountAt = async (width: number) => {
+      await page.setViewportSize({ width, height: 900 });
+      await page.goto('/profile/');
+      return page
+        .locator('.credential-grid')
+        .evaluate((grid) => getComputedStyle(grid).gridTemplateColumns.split(' ').length);
+    };
+
+    expect(await columnCountAt(1366)).toBeGreaterThan(1);
+    expect(await columnCountAt(700)).toBe(1);
   });
 
   test('keeps languages and community content separate at intermediate desktop widths', async ({ page, isMobile }) => {

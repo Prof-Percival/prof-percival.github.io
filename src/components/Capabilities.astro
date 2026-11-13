@@ -9,7 +9,11 @@ interface Props {
 const { number = '04' } = Astro.props;
 ---
 
-<section class="section capabilities-section shell" aria-labelledby="capabilities-title">
+<section
+  id="capabilities"
+  class="section capabilities-section shell indexed-section"
+  aria-labelledby="capabilities-title"
+>
   <SectionHeading
     number={number}
     eyebrow="Capabilities"

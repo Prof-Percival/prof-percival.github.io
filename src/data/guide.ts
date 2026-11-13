@@ -150,8 +150,8 @@ export const guideAnswers: readonly GuideAnswer[] = [
     ],
     title: 'Application development and software engineering',
     answer:
-      'Phadima has studied application development, software engineering, ICT applications development, and Python programming. His profile also links five selected credentials from more than 100 completed credentials.',
-    sourceLabel: 'Education and credentials',
+      'Phadima has studied application development, software engineering, ICT applications development, and Python programming. His profile also links five selected certifications from more than 100 completed certifications.',
+    sourceLabel: 'Education and certifications',
     sourceHref: '/profile/#about',
   },
   {

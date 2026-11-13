@@ -10,7 +10,7 @@ interface Props {
 const { number = '06' } = Astro.props;
 ---
 
-<section class="section contact-section shell" id="contact" aria-labelledby="contact-title">
+<section class="section contact-section shell indexed-section" id="contact" aria-labelledby="contact-title">
   <SectionHeading
     number={number}
     eyebrow="Contact"
@@ -37,10 +37,10 @@ const { number = '06' } = Astro.props;
           <dt>Also find me</dt>
           <dd>
             <a href={site.links.github} target="_blank" rel="noopener noreferrer" data-track="github-contact">
-              GitHub <ArrowIcon />
+              GitHub <ArrowIcon /> <span class="sr-only">(opens in a new tab)</span>
             </a>
             <a href={site.links.linkedin} target="_blank" rel="noopener noreferrer" data-track="linkedin-contact">
-              LinkedIn <ArrowIcon />
+              LinkedIn <ArrowIcon /> <span class="sr-only">(opens in a new tab)</span>
             </a>
           </dd>
         </div>

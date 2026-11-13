@@ -62,15 +62,76 @@ test.describe('release integrity', () => {
             if (!leavesPortfolio) return [];
 
             const rel = new Set(anchor.rel.split(/\s+/).filter(Boolean));
-            return anchor.target === '_blank' && rel.has('noopener') && rel.has('noreferrer')
+            const announcesNewTab = anchor.textContent?.includes('(opens in a new tab)') ?? false;
+            return anchor.target === '_blank' && rel.has('noopener') && rel.has('noreferrer') && announcesNewTab
               ? []
-              : [`${anchor.textContent?.trim() ?? anchor.href}: ${anchor.target || 'same tab'}; rel=${anchor.rel}`];
+              : [
+                  `${anchor.textContent?.trim() ?? anchor.href}: ${anchor.target || 'same tab'}; rel=${anchor.rel}; announced=${announcesNewTab}`,
+                ];
           })
         ))
       );
     }
 
     expect(violations).toEqual([]);
+  });
+
+  test('offers compact wayfinding on every project story', async ({ page }) => {
+    const projectIndexes = [
+      {
+        route: '/work/missing-children-sa/',
+        label: 'Missing Children SA sections',
+        links: [
+          ['Overview', '#case-overview'],
+          ['Guided story', '#missing-children-guide'],
+          ['Interactive workflow', '#missing-children-demo'],
+          ['Engineering details', '#engineering-details'],
+        ],
+      },
+      {
+        route: '/work/fraud-rule-engine/',
+        label: 'Fraud Rule Engine sections',
+        links: [
+          ['Overview', '#case-overview'],
+          ['Guided story', '#fraud-guide'],
+          ['Synthetic evaluator', '#fraud-demo'],
+          ['Engineering details', '#engineering-details'],
+        ],
+      },
+      {
+        route: '/work/agent-risk-monitor/',
+        label: 'Agent Activity Risk Monitor sections',
+        links: [
+          ['Overview', '#case-overview'],
+          ['Guided story', '#agent-guide'],
+          ['Synthetic pipeline', '#agent-demo'],
+          ['Engineering details', '#engineering-details'],
+        ],
+      },
+      {
+        route: '/work/shelfiq/',
+        label: 'ShelfIQ sections',
+        links: [
+          ['Overview', '#case-overview'],
+          ['Product path', '#shelfiq-product-path'],
+          ['Engineering details', '#engineering-details'],
+          ['Release gates', '#release-gates'],
+        ],
+      },
+    ] as const;
+
+    for (const project of projectIndexes) {
+      await page.goto(project.route);
+      const pageIndex = page.getByRole('navigation', { name: project.label });
+      await expect(pageIndex).toBeVisible();
+      for (const [label, href] of project.links) {
+        await expect(pageIndex.getByRole('link', { name: new RegExp(label) })).toHaveAttribute('href', href);
+      }
+
+      await pageIndex.getByRole('link', { name: /Engineering details/ }).click();
+      await expect(page).toHaveURL(/#engineering-details$/);
+      await expect(page.locator('#engineering-details')).toBeInViewport();
+    }
   });
 
   test('removes project entrance motion when reduced motion is requested', async ({ page }) => {

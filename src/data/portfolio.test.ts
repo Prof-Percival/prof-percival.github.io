@@ -32,6 +32,7 @@ describe('portfolio content', () => {
   it('keeps credentials curated and the language list unique', () => {
     expect(certifications).toHaveLength(5);
     expect(certifications.every((credential) => credential.url.startsWith('https://'))).toBe(true);
+    expect(certifications.every((credential) => credential.category.length > 0)).toBe(true);
     expect(new Set(languages.map((language) => language.name)).size).toBe(languages.length);
   });
 });

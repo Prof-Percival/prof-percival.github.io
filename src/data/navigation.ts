@@ -35,7 +35,7 @@ export const portfolioRoutes: readonly PortfolioRoute[] = [
     number: '03',
     label: 'Profile',
     href: '/profile/',
-    description: 'Read capabilities, education, credentials, and contact details.',
+    description: 'Read capabilities, education, certifications, and contact details.',
   },
   {
     id: 'guide',

@@ -11,7 +11,7 @@ interface Props {
 const { number = '05' } = Astro.props;
 ---
 
-<section class="section about-section shell" id="about" aria-labelledby="about-title">
+<section class="section about-section shell indexed-section" id="about" aria-labelledby="about-title">
   <SectionHeading
     number={number}
     eyebrow="About"
@@ -43,7 +43,7 @@ const { number = '05' } = Astro.props;
         rel="noopener noreferrer"
         data-track="cv-about"
       >
-        Download my CV <ArrowIcon />
+        Download my CV <ArrowIcon /> <span class="sr-only">(opens in a new tab)</span>
       </a>
     </div>
 
