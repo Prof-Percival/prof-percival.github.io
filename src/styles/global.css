@@ -1368,8 +1368,10 @@
 
   .project-card__image img {
     width: min(78%, 38rem);
-    max-height: 78%;
+    height: 78%;
+    max-height: none;
     object-fit: contain;
+    object-position: center;
     filter: saturate(0.88) contrast(1.02);
     transition:
       transform 400ms var(--ease-out),
