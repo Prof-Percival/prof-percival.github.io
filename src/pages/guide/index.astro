@@ -8,6 +8,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 <BaseLayout
   title="Verified portfolio guide | Phadima Percival Maredi"
   description="Ask focused questions about the published projects, experience, capabilities, education, and contact options of software engineer Phadima Percival Maredi."
+  localAi
 >
   <AppShell active="guide">
     <main id="main" class="route-page guide-route">
@@ -15,11 +16,12 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
         number="04"
         eyebrow="Portfolio guide"
         title="Ask a focused question. Follow the source."
-        introduction="Verified mode searches a curated set of published portfolio answers. It stays useful without a model, keeps every claim inspectable, and always links you to the full context."
+        introduction="Verified mode searches a curated set of published portfolio answers. Optional Local AI can interpret a question on the visitor's device, but it only ranks those same inspectable answers."
       >
         <div class="route-hero__facts" aria-label="Portfolio guide summary">
           <span>Curated answers</span>
           <span>Browser-only matching</span>
+          <span>Optional Local AI</span>
           <span>Source links included</span>
         </div>
       </RouteHero>
