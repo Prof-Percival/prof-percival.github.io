@@ -1,0 +1,94 @@
+---
+import AppShell from '../../components/AppShell.astro';
+import ArrowIcon from '../../components/ArrowIcon.astro';
+import { certificatePreviews, certifications, type CertificatePreview } from '../../data/portfolio';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+export function getStaticPaths() {
+  return certificatePreviews.map((preview) => ({ params: { slug: preview.slug }, props: { preview } }));
+}
+
+interface Props {
+  preview: CertificatePreview;
+}
+
+const { preview } = Astro.props;
+const certification = certifications.find((item) => 'previewSlug' in item && item.previewSlug === preview.slug);
+if (!certification) throw new Error(`Missing certification for preview: ${preview.slug}`);
+---
+
+<BaseLayout
+  title={`${certification.title} | Certificate preview | Phadima Percival Maredi`}
+  description={`View a certificate preview for ${certification.title}, issued by ${certification.issuer} to Phadima Percival Maredi.`}
+>
+  <AppShell active="profile">
+    <main id="main" class="route-page">
+      <article class="certificate-page">
+        <header class="certificate-page__header shell">
+          <a class="text-link" href="/profile/#credentials">
+            <ArrowIcon direction="left" /> Back to certifications
+          </a>
+          <p class="eyebrow">Certificate preview</p>
+          <h1>{certification.title}</h1>
+          <dl>
+            <div>
+              <dt>Issuer</dt>
+              <dd>{certification.issuer}</dd>
+            </div>
+            <div>
+              <dt>Issued</dt>
+              <dd>{certification.issued}</dd>
+            </div>
+            <div>
+              <dt>Format</dt>
+              <dd>High-resolution image preview</dd>
+            </div>
+          </dl>
+        </header>
+
+        <section class="certificate-document shell" aria-labelledby="certificate-document-title">
+          <figure>
+            <a
+              href={preview.image}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={`View full-size preview of ${certification.title} in a new tab`}
+            >
+              <img
+                src={preview.image}
+                width={preview.width}
+                height={preview.height}
+                alt={preview.alt}
+                loading="eager"
+                decoding="async"
+              />
+            </a>
+            <figcaption>Preview shown at its original supplied resolution without re-encoding or upscaling.</figcaption>
+          </figure>
+
+          <div class="certificate-document__details">
+            <p class="eyebrow">Available actions</p>
+            <h2 id="certificate-document-title">View or save the supplied preview.</h2>
+            <p>
+              The available source asset is a high-resolution certificate image. The original PDF was not included in
+              the saved LinkedIn page source, so the download below is labelled as a preview image.
+            </p>
+            <div class="certificate-document__actions">
+              <a class="button button--primary" href={preview.image} target="_blank" rel="noopener noreferrer">
+                View full-size preview <ArrowIcon /> <span class="sr-only">(opens in a new tab)</span>
+              </a>
+              <a class="button button--secondary" href={preview.image} download={preview.downloadName}>
+                Download preview <ArrowIcon direction="down" />
+              </a>
+              {preview.issuerUrl && (
+                <a class="text-link" href={preview.issuerUrl} target="_blank" rel="noopener noreferrer">
+                  Verify with the issuer <ArrowIcon /> <span class="sr-only">(opens in a new tab)</span>
+                </a>
+              )}
+            </div>
+          </div>
+        </section>
+      </article>
+    </main>
+  </AppShell>
+</BaseLayout>
