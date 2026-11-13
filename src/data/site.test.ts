@@ -7,7 +7,6 @@ describe('site metadata', () => {
     expect(new URL(site.url).protocol).toBe('https:');
     expect(new URL(site.links.github).protocol).toBe('https:');
     expect(site.links.linkedin).toBe('https://za.linkedin.com/in/prof-percival');
-    expect(site.links.linkedinCertifications).toBe('https://www.linkedin.com/in/prof-percival/details/certifications/');
   });
 
   it('uses the dedicated Formspree form endpoint', () => {

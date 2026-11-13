@@ -565,7 +565,7 @@ test.describe('profile route', () => {
     await expect(page.locator('[data-credential-source="linkedin"]')).toHaveCount(3);
     await expect(page.getByRole('link', { name: /View all certifications on LinkedIn/ })).toHaveAttribute(
       'href',
-      'https://www.linkedin.com/in/prof-percival/details/certifications/'
+      'https://za.linkedin.com/in/prof-percival'
     );
 
     await pageIndex.getByRole('link', { name: /Languages/ }).click();
