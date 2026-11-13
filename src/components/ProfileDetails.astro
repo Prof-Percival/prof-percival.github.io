@@ -45,7 +45,7 @@ const certificationGroups = [
           <div class="credential-grid" data-certification-group={group.id}>
             {group.items.map((credential, index) => (
               <a
-                href={'url' in credential ? credential.url : site.links.linkedinCertifications}
+                href={'url' in credential ? credential.url : site.links.linkedin}
                 target="_blank"
                 rel="noopener noreferrer"
                 data-track={'url' in credential ? 'credential-open' : 'linkedin-certification-open'}
@@ -72,7 +72,7 @@ const certificationGroups = [
     </div>
     <a
       class="text-link credentials__all"
-      href={site.links.linkedinCertifications}
+      href={site.links.linkedin}
       target="_blank"
       rel="noopener noreferrer"
       data-track="linkedin-credentials"
