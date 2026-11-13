@@ -6009,3 +6009,73 @@
     transition: none;
   }
 }
+
+@layer components {
+  .case-study__hero > * {
+    animation: case-copy-enter 720ms var(--ease-out) both;
+  }
+
+  .case-study__hero > :nth-child(2) {
+    animation-delay: 60ms;
+  }
+
+  .case-study__hero > :nth-child(3) {
+    animation-delay: 110ms;
+  }
+
+  .case-study__hero > :nth-child(4) {
+    animation-delay: 160ms;
+  }
+
+  .case-study__hero > :nth-child(5),
+  .case-study__hero > :nth-child(6) {
+    animation-delay: 210ms;
+  }
+
+  .case-study__visual {
+    view-transition-name: project-visual;
+  }
+
+  .case-study__visual > * {
+    animation: case-visual-enter 900ms 180ms var(--ease-out) both;
+  }
+
+  @keyframes case-copy-enter {
+    from {
+      transform: translateY(1.15rem);
+    }
+    to {
+      transform: none;
+    }
+  }
+
+  @keyframes case-visual-enter {
+    from {
+      opacity: 0;
+      clip-path: inset(8% 3% 8% 3% round var(--radius-lg));
+      transform: translateY(1.5rem) scale(0.985);
+    }
+    to {
+      opacity: 1;
+      clip-path: inset(0 round 0);
+      transform: none;
+    }
+  }
+}
+
+@media (max-width: 43rem) {
+  .case-study__hero > * {
+    animation-duration: 480ms;
+  }
+
+  .case-study__visual > * {
+    animation-duration: 620ms;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .case-study__hero > *,
+  .case-study__visual > * {
+    animation: none;
+  }
+}

@@ -3,6 +3,7 @@ import '@fontsource-variable/jetbrains-mono';
 import '@fontsource-variable/manrope';
 import '@fontsource-variable/newsreader';
 import Analytics from '../components/Analytics.astro';
+import HashNavigation from '../components/HashNavigation.astro';
 import '../styles/global.css';
 
 import { site } from '../data/site';
@@ -109,6 +110,7 @@ const structuredData = {
       Skip to content
     </a>
     <slot />
+    <HashNavigation />
     <Analytics />
   </body>
 </html>

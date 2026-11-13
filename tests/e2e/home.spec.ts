@@ -558,6 +558,15 @@ test.describe('contact form', () => {
     await page.goto('/profile/#contact');
   });
 
+  test('aligns the contact deep link after the page finishes loading', async ({ page }) => {
+    await page.waitForLoadState('load');
+    const heading = await page
+      .getByRole('heading', { name: 'Good systems start with a clear conversation.' })
+      .boundingBox();
+    expect(heading).not.toBeNull();
+    expect(heading!.y).toBeLessThan(page.viewportSize()!.height / 2);
+  });
+
   test('uses the dedicated Formspree endpoint and visible labels', async ({ page }) => {
     const form = page.locator('[data-contact-form]');
     await expect(form).toHaveAttribute('action', 'https://formspree.io/f/xaeondbn');
