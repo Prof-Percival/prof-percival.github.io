@@ -3,6 +3,7 @@ export type GuideAnswerId =
   | 'featured-system'
   | 'fraud-rule-engine'
   | 'agent-risk-monitor'
+  | 'shelfiq'
   | 'experience'
   | 'back-end'
   | 'cloud-delivery'
@@ -61,6 +62,16 @@ export const guideAnswers: readonly GuideAnswer[] = [
       'The Agent Activity Risk Monitor uses Fastify for ingestion and reads, Python for five pure analysis rules, and PostgreSQL as the shared contract. Unique events and alerts plus concurrent row claiming keep retries and multiple analyzers safe.',
     sourceLabel: 'Agent Activity Risk Monitor case study',
     sourceHref: '/work/agent-risk-monitor/',
+  },
+  {
+    id: 'shelfiq',
+    prompt: 'What is ShelfIQ?',
+    keywords: ['ShelfIQ', 'product', 'expiry', 'barcode', 'inventory', 'dashboard', 'image', '.NET'],
+    title: 'A product-expiry platform in development',
+    answer:
+      'ShelfIQ is a private-source .NET 8 product in development for capturing shelf-life data, classifying expiry status, verifying barcodes, summarizing inventory, and handling product images through a separate boundary. It has not been publicly launched, and its page lists the gates that remain before release.',
+    sourceLabel: 'ShelfIQ project story',
+    sourceHref: '/work/shelfiq/',
   },
   {
     id: 'experience',
