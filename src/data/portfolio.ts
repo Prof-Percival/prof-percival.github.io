@@ -18,6 +18,12 @@ export type EarlierProject = {
   alt: string;
 };
 
+export type CertificatePreviewSlug =
+  'agentcore' | 'building-generative-ai-solutions' | 'alx-software-engineering' | 'omet-peer-buddy-leadership';
+
+type CertificationDestination =
+  { url: string; previewSlug?: never } | { previewSlug: CertificatePreviewSlug; url?: never };
+
 export type Certification = {
   group: 'recent' | 'selected';
   title: string;
@@ -25,7 +31,16 @@ export type Certification = {
   issuer: string;
   issued: string;
   issuedAt: `${number}-${number}`;
-  url?: string;
+} & CertificationDestination;
+
+export type CertificatePreview = {
+  slug: CertificatePreviewSlug;
+  image: string;
+  width: number;
+  height: number;
+  alt: string;
+  downloadName: string;
+  issuerUrl?: string;
 };
 
 export const experience: Experience[] = [
@@ -175,6 +190,7 @@ export const certifications = [
     issuer: 'Amazon Web Services (AWS)',
     issued: 'October 2026',
     issuedAt: '2026-10',
+    previewSlug: 'agentcore',
   },
   {
     group: 'recent',
@@ -192,7 +208,7 @@ export const certifications = [
     issuer: 'Udacity',
     issued: 'May 2025',
     issuedAt: '2025-05',
-    url: 'https://www.udacity.com/certificate/e/c66d792e-137e-11f0-bc0c-1b41a922a47c',
+    previewSlug: 'building-generative-ai-solutions',
   },
   {
     group: 'recent',
@@ -219,6 +235,7 @@ export const certifications = [
     issuer: 'ALX Africa',
     issued: 'March 2024',
     issuedAt: '2024-03',
+    previewSlug: 'alx-software-engineering',
   },
   {
     group: 'recent',
@@ -227,6 +244,7 @@ export const certifications = [
     issuer: 'Old Mutual South Africa',
     issued: 'December 2023',
     issuedAt: '2023-12',
+    previewSlug: 'omet-peer-buddy-leadership',
   },
   {
     group: 'recent',
@@ -328,6 +346,43 @@ export const certifications = [
     url: 'https://learn.microsoft.com/en-us/training/achievements/learn.mec.accessibility-special-education-online-learning-equity.badge?username=PhadimaPercivalMaredi-3609&sharingId=39709B2ADFF2D158',
   },
 ] as const satisfies readonly Certification[];
+
+export const certificatePreviews = [
+  {
+    slug: 'agentcore',
+    image: '/certificates/agentcore.jpg',
+    width: 1929,
+    height: 1364,
+    alt: 'Machine Learning University certificate of completion awarded to Phadima Maredi for From Prototype toward Production with AgentCore',
+    downloadName: 'phadima-maredi-agentcore-certificate-preview.jpg',
+  },
+  {
+    slug: 'building-generative-ai-solutions',
+    image: '/certificates/building-generative-ai-solutions.jpg',
+    width: 1269,
+    height: 981,
+    alt: 'Udacity verified certificate of course completion awarded to Phadima Percival Maredi for Building Generative AI Solutions',
+    downloadName: 'phadima-maredi-building-generative-ai-solutions-certificate-preview.jpg',
+    issuerUrl: 'https://www.udacity.com/certificate/e/c66d792e-137e-11f0-bc0c-1b41a922a47c',
+  },
+  {
+    slug: 'alx-software-engineering',
+    image: '/certificates/alx-software-engineering.png',
+    width: 1280,
+    height: 720,
+    alt: 'ALX Software Engineering certificate of completion awarded to Phadima Percival Maredi',
+    downloadName: 'phadima-maredi-alx-software-engineering-certificate-preview.png',
+    issuerUrl: 'https://savanna.alxafrica.com/certificates/7BNE89RMF6',
+  },
+  {
+    slug: 'omet-peer-buddy-leadership',
+    image: '/certificates/omet-peer-buddy-leadership.jpg',
+    width: 1929,
+    height: 1364,
+    alt: 'Old Mutual Education Trust Peer-Buddy Leadership certificate awarded to Phadima Percival Maredi',
+    downloadName: 'phadima-maredi-omet-peer-buddy-leadership-certificate-preview.jpg',
+  },
+] as const satisfies readonly CertificatePreview[];
 
 export const languages = [
   { name: 'Sepedi', proficiency: 'Native or bilingual' },

@@ -562,7 +562,26 @@ test.describe('profile route', () => {
     await expect(page.locator('[data-certification-group="recent"] > a')).toHaveCount(8);
     await expect(page.locator('[data-certification-group="selected"] > a')).toHaveCount(10);
     await expect(page.locator('.credential-card__category')).toHaveCount(18);
-    await expect(page.locator('[data-credential-source="linkedin"]')).toHaveCount(3);
+    await expect(page.locator('[data-credential-source="portfolio"]')).toHaveCount(4);
+    for (const [title, href] of [
+      ['From Prototype toward Production with AgentCore', '/certificates/agentcore/'],
+      ['Building Generative AI Solutions - OLX', '/certificates/building-generative-ai-solutions/'],
+      ['ALX Software Engineering', '/certificates/alx-software-engineering/'],
+      ['OMET Peer Buddy Leadership', '/certificates/omet-peer-buddy-leadership/'],
+    ]) {
+      const previewLink = page.getByRole('link', { name: new RegExp(title) });
+      await expect(previewLink).toHaveAttribute('href', href);
+      await expect(previewLink).not.toHaveAttribute('target', '_blank');
+    }
+    expect(
+      await page
+        .locator('.credential-grid > a')
+        .evaluateAll((links) =>
+          links
+            .map((link) => (link as HTMLAnchorElement).href)
+            .filter((href) => new URL(href).hostname.endsWith('linkedin.com'))
+        )
+    ).toEqual([]);
     await expect(page.getByRole('link', { name: /View all certifications on LinkedIn/ })).toHaveAttribute(
       'href',
       'https://za.linkedin.com/in/prof-percival'
@@ -637,6 +656,66 @@ test.describe('profile route', () => {
       expect(layout.languageHeadingContained, `${width}px language heading should stay in its section`).toBe(true);
       expect(layout.secondaryOverflow, `${width}px secondary content should not overflow`).toBeLessThanOrEqual(0);
       expect(layout.communityOverflow, `${width}px community content should not overflow`).toBeLessThanOrEqual(0);
+    }
+  });
+});
+
+test.describe('certificate previews', () => {
+  test('provides local high-resolution views and preview downloads', async ({ page }) => {
+    const previews = [
+      {
+        route: '/certificates/agentcore/',
+        title: 'From Prototype toward Production with AgentCore',
+        image: '/certificates/agentcore.jpg',
+        width: 1929,
+        height: 1364,
+        download: 'phadima-maredi-agentcore-certificate-preview.jpg',
+      },
+      {
+        route: '/certificates/building-generative-ai-solutions/',
+        title: 'Building Generative AI Solutions - OLX',
+        image: '/certificates/building-generative-ai-solutions.jpg',
+        width: 1269,
+        height: 981,
+        download: 'phadima-maredi-building-generative-ai-solutions-certificate-preview.jpg',
+      },
+      {
+        route: '/certificates/alx-software-engineering/',
+        title: 'ALX Software Engineering',
+        image: '/certificates/alx-software-engineering.png',
+        width: 1280,
+        height: 720,
+        download: 'phadima-maredi-alx-software-engineering-certificate-preview.png',
+      },
+      {
+        route: '/certificates/omet-peer-buddy-leadership/',
+        title: 'OMET Peer Buddy Leadership',
+        image: '/certificates/omet-peer-buddy-leadership.jpg',
+        width: 1929,
+        height: 1364,
+        download: 'phadima-maredi-omet-peer-buddy-leadership-certificate-preview.jpg',
+      },
+    ] as const;
+
+    for (const preview of previews) {
+      await page.goto(preview.route);
+      await expect(page.getByRole('heading', { level: 1, name: preview.title })).toBeVisible();
+      await expect(page.getByRole('link', { name: /Back to certifications/ })).toHaveAttribute(
+        'href',
+        '/profile/#credentials'
+      );
+      const image = page.locator('.certificate-document img');
+      await expect(image).toHaveAttribute('src', preview.image);
+      await image.evaluate((element: HTMLImageElement) => element.decode());
+      expect(await image.evaluate((element: HTMLImageElement) => element.naturalWidth)).toBe(preview.width);
+      expect(await image.evaluate((element: HTMLImageElement) => element.naturalHeight)).toBe(preview.height);
+      await expect(page.getByRole('link', { name: /View full-size preview/ }).last()).toHaveAttribute(
+        'target',
+        '_blank'
+      );
+      await expect(page.getByRole('link', { name: /Download preview/ })).toHaveAttribute('download', preview.download);
+      await expect(page.getByText(/original PDF was not included in the saved LinkedIn page source/i)).toBeVisible();
+      await expectAccessibleAndContained(page);
     }
   });
 });

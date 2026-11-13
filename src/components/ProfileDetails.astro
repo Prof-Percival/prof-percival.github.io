@@ -45,11 +45,11 @@ const certificationGroups = [
           <div class="credential-grid" data-certification-group={group.id}>
             {group.items.map((credential, index) => (
               <a
-                href={'url' in credential ? credential.url : site.links.linkedin}
-                target="_blank"
-                rel="noopener noreferrer"
-                data-track={'url' in credential ? 'credential-open' : 'linkedin-certification-open'}
-                data-credential-source={'url' in credential ? 'issuer' : 'linkedin'}
+                href={'url' in credential ? credential.url : `/certificates/${credential.previewSlug}/`}
+                target={'url' in credential ? '_blank' : undefined}
+                rel={'url' in credential ? 'noopener noreferrer' : undefined}
+                data-track={'url' in credential ? 'credential-open' : 'certificate-preview-open'}
+                data-credential-source={'url' in credential ? 'issuer' : 'portfolio'}
               >
                 <span class="credential-card__number">{String(group.start + index).padStart(2, '0')}</span>
                 <div class="credential-card__copy">
@@ -59,10 +59,9 @@ const certificationGroups = [
                     {credential.issuer} · {credential.issued}
                   </small>
                 </div>
-                <ArrowIcon />
+                <ArrowIcon direction={'url' in credential ? 'up-right' : 'right'} />
                 <span class="sr-only">
-                  {'url' in credential ? 'Verify credential.' : 'View this certification on LinkedIn.'} (opens in a new
-                  tab)
+                  {'url' in credential ? 'Verify credential. (opens in a new tab)' : 'View certificate preview.'}
                 </span>
               </a>
             ))}

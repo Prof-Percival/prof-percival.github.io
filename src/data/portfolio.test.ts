@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  certificatePreviews,
   certifications,
   earlierProjects,
   experience,
@@ -64,6 +65,11 @@ describe('portfolio content', () => {
     expect(certifications.every((credential) => !('url' in credential) || credential.url.startsWith('https://'))).toBe(
       true
     );
+    expect(
+      certifications.every(
+        (credential) => !('url' in credential) || !new URL(credential.url).hostname.endsWith('linkedin.com')
+      )
+    ).toBe(true);
     expect(certifications.every((credential) => credential.category.length > 0)).toBe(true);
     expect(selected.map((credential) => credential.title)).toEqual(
       expect.arrayContaining([
@@ -74,6 +80,17 @@ describe('portfolio content', () => {
         'Introduction to Cybersecurity',
       ])
     );
+  });
+
+  it('maps uploaded certificate images to local preview routes', () => {
+    const previewSlugs = certifications.flatMap((credential) =>
+      'previewSlug' in credential ? [credential.previewSlug] : []
+    );
+
+    expect(previewSlugs).toEqual(certificatePreviews.map((preview) => preview.slug));
+    expect(certificatePreviews).toHaveLength(4);
+    expect(certificatePreviews.every((preview) => preview.image.startsWith('/certificates/'))).toBe(true);
+    expect(certificatePreviews.every((preview) => preview.width >= 1200 && preview.height >= 720)).toBe(true);
   });
 
   it('keeps the language list unique', () => {
