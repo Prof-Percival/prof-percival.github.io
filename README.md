@@ -39,7 +39,7 @@ npm audit --omit=dev --audit-level=high
 
 The contact form posts to the dedicated Formspree endpoint in `src/data/site.ts`. Browser tests mock provider responses and must never send a real message.
 
-GoatCounter stays disabled unless `PUBLIC_GOATCOUNTER_ENDPOINT` is configured at build time. Copy `.env.example` to `.env` for local development and use a public endpoint in this form:
+GoatCounter receives its public count endpoint from the `PUBLIC_GOATCOUNTER_ENDPOINT` GitHub Actions repository variable during the Pages build. Copy `.env.example` to `.env` only when testing a build locally, and use an endpoint in this form:
 
 ```dotenv
 PUBLIC_GOATCOUNTER_ENDPOINT=https://your-site-code.goatcounter.com/count
