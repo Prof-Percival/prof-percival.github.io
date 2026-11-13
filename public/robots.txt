@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://prof-percival.github.io/sitemap-index.xml

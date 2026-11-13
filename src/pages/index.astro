@@ -3,6 +3,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import About from '../components/About.astro';
 import ArrowIcon from '../components/ArrowIcon.astro';
 import Capabilities from '../components/Capabilities.astro';
+import ContactForm from '../components/ContactForm.astro';
 import EarlierWork from '../components/EarlierWork.astro';
 import ExperienceTimeline from '../components/ExperienceTimeline.astro';
 import Footer from '../components/Footer.astro';
@@ -65,11 +66,7 @@ import { site } from '../data/site';
     <Capabilities />
     <About />
 
-    <section class="section shell placeholder-section" id="contact" aria-labelledby="contact-title">
-      <p class="eyebrow">06 / Contact</p>
-      <h2 id="contact-title">Good systems start with a clear conversation.</h2>
-      <p>The full contact experience arrives with the dedicated Formspree integration checkpoint.</p>
-    </section>
+    <ContactForm />
   </main>
   <Footer />
 </BaseLayout>

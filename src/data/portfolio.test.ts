@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { earlierProjects, experience, missingChildrenCaseStudy } from './portfolio';
+import { certifications, earlierProjects, experience, languages, missingChildrenCaseStudy } from './portfolio';
 
 describe('portfolio content', () => {
   it('has one current role with the requested title', () => {
@@ -27,5 +27,11 @@ describe('portfolio content', () => {
     expect(missingChildrenCaseStudy.slug).toBe('missing-children-sa');
     expect(missingChildrenCaseStudy.surfaces.map((surface) => surface.label)).toEqual(['API', 'Desktop', 'Mobile']);
     expect(missingChildrenCaseStudy.decisions).toHaveLength(4);
+  });
+
+  it('keeps credentials curated and the language list unique', () => {
+    expect(certifications).toHaveLength(5);
+    expect(certifications.every((credential) => credential.url.startsWith('https://'))).toBe(true);
+    expect(new Set(languages.map((language) => language.name)).size).toBe(languages.length);
   });
 });

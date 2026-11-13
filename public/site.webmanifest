@@ -1,0 +1,17 @@
+{
+  "name": "Phadima Percival Maredi",
+  "short_name": "PM Portfolio",
+  "description": "Software engineering portfolio of Phadima Percival Maredi.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#090d12",
+  "theme_color": "#090d12",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

@@ -1,0 +1,156 @@
+---
+import { site } from '../data/site';
+import ArrowIcon from './ArrowIcon.astro';
+import SectionHeading from './SectionHeading.astro';
+---
+
+<section class="section contact-section shell" id="contact" aria-labelledby="contact-title">
+  <SectionHeading
+    number="06"
+    eyebrow="Contact"
+    id="contact-title"
+    title="Good systems start with a clear conversation."
+    introduction="Have a role, project, or difficult software problem in mind? Send enough context to make the first reply useful."
+  />
+
+  <div class="contact-grid">
+    <div class="contact-aside">
+      <p class="contact-aside__lead">
+        I am always interested in thoughtful engineering work and conversations that begin with a real problem.
+      </p>
+      <dl>
+        <div>
+          <dt>Based in</dt>
+          <dd>{site.location}</dd>
+        </div>
+        <div>
+          <dt>Current focus</dt>
+          <dd>Financial products · Cloud · Full-stack systems</dd>
+        </div>
+        <div>
+          <dt>Also find me</dt>
+          <dd>
+            <a href={site.links.github} data-track="github-contact">
+              GitHub <ArrowIcon />
+            </a>
+            <a href={site.links.linkedin} data-track="linkedin-contact">
+              LinkedIn <ArrowIcon />
+            </a>
+          </dd>
+        </div>
+      </dl>
+    </div>
+
+    <form class="contact-form" action={site.contact.formspreeEndpoint} method="POST" data-contact-form>
+      <input type="hidden" name="_subject" value="New message from the Phadima Percival Maredi portfolio" />
+      <div class="honeypot" aria-hidden="true">
+        <label for="company-website">Leave this field empty</label>
+        <input id="company-website" name="_gotcha" type="text" tabindex="-1" autocomplete="off" />
+      </div>
+
+      <div class="form-row">
+        <div class="form-field">
+          <label for="contact-name">Name</label>
+          <input id="contact-name" name="name" type="text" autocomplete="name" maxlength="100" required />
+        </div>
+        <div class="form-field">
+          <label for="contact-email">Email</label>
+          <input id="contact-email" name="email" type="email" autocomplete="email" maxlength="254" required />
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-field">
+          <label for="contact-company">
+            Company <span>Optional</span>
+          </label>
+          <input id="contact-company" name="company" type="text" autocomplete="organization" maxlength="120" />
+        </div>
+        <div class="form-field">
+          <label for="contact-subject">What is this about?</label>
+          <select id="contact-subject" name="subject" required>
+            <option value="">Choose one</option>
+            <option value="Role or opportunity">Role or opportunity</option>
+            <option value="Project or collaboration">Project or collaboration</option>
+            <option value="Speaking or mentoring">Speaking or mentoring</option>
+            <option value="Other">Something else</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-field">
+        <label for="contact-message">Message</label>
+        <textarea
+          id="contact-message"
+          name="message"
+          rows="7"
+          minlength="20"
+          maxlength="4000"
+          aria-describedby="contact-message-help"
+          required
+        ></textarea>
+        <small id="contact-message-help">
+          20 to 4,000 characters. Do not include passwords or sensitive information.
+        </small>
+      </div>
+
+      <div class="contact-form__footer">
+        <p>
+          By sending, you agree that Formspree may process this message. <a href="/privacy/">Privacy details</a>.
+        </p>
+        <button class="button button--primary" type="submit" data-submit>
+          <span data-submit-label>Send message</span>
+          <ArrowIcon />
+        </button>
+      </div>
+      <p class="form-status" data-form-status role="status" aria-live="polite" aria-atomic="true"></p>
+    </form>
+  </div>
+</section>
+
+<script>
+  const forms = document.querySelectorAll<HTMLFormElement>('[data-contact-form]');
+
+  forms.forEach((form) => {
+    const submit = form.querySelector<HTMLButtonElement>('[data-submit]');
+    const label = form.querySelector<HTMLElement>('[data-submit-label]');
+    const status = form.querySelector<HTMLElement>('[data-form-status]');
+
+    form.addEventListener('submit', async (event) => {
+      if (!form.reportValidity()) return;
+      event.preventDefault();
+      if (!submit || !label || !status) return;
+
+      submit.disabled = true;
+      label.textContent = 'Sending';
+      status.dataset.state = 'sending';
+      status.textContent = 'Sending your message…';
+
+      const controller = new AbortController();
+      const timeout = window.setTimeout(() => controller.abort(), 15_000);
+
+      try {
+        const response = await fetch(form.action, {
+          method: 'POST',
+          body: new FormData(form),
+          headers: { Accept: 'application/json' },
+          signal: controller.signal,
+        });
+
+        if (!response.ok) throw new Error('Submission failed');
+
+        form.reset();
+        status.dataset.state = 'success';
+        status.textContent = 'Message sent. Thank you. I will reply as soon as I can.';
+        document.dispatchEvent(new CustomEvent('portfolio:track', { detail: { path: 'contact-submit' } }));
+      } catch {
+        status.dataset.state = 'error';
+        status.textContent = 'Your message could not be sent. Please try again or contact me through LinkedIn.';
+      } finally {
+        window.clearTimeout(timeout);
+        submit.disabled = false;
+        label.textContent = 'Send message';
+      }
+    });
+  });
+</script>

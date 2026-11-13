@@ -6,7 +6,7 @@ describe('site metadata', () => {
   it('uses secure public URLs', () => {
     expect(new URL(site.url).protocol).toBe('https:');
     expect(new URL(site.links.github).protocol).toBe('https:');
-    expect(new URL(site.links.linkedin).protocol).toBe('https:');
+    expect(site.links.linkedin).toBe('https://za.linkedin.com/in/prof-percival');
   });
 
   it('uses the dedicated Formspree form endpoint', () => {
