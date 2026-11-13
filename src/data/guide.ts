@@ -1,6 +1,8 @@
 export type GuideAnswerId =
   | 'engineering-approach'
   | 'featured-system'
+  | 'fraud-rule-engine'
+  | 'agent-risk-monitor'
   | 'experience'
   | 'back-end'
   | 'cloud-delivery'
@@ -39,6 +41,26 @@ export const guideAnswers: readonly GuideAnswer[] = [
       'Missing Children SA connects an ASP.NET Core API, a Windows desktop operations application, and a .NET MAUI mobile experience. The case study explains moderation before public visibility, shared contracts, temporal history, and separate media storage.',
     sourceLabel: 'Missing Children SA case study',
     sourceHref: '/work/missing-children-sa/',
+  },
+  {
+    id: 'fraud-rule-engine',
+    prompt: 'How does the Fraud Rule Engine work?',
+    keywords: ['fraud', 'transactions', 'rules', 'risk score', 'Approve', 'Review', 'Decline', '.NET', 'PostgreSQL'],
+    title: 'Eight rules with an explanation for every decision',
+    answer:
+      'The Fraud Rule Engine combines transaction, recent-history, and customer-baseline signals in a .NET 10 service. Eight rules feed one scoring policy, every assessment records its rule outcomes and rule-set version, and the API returns Approve, Review, or Decline.',
+    sourceLabel: 'Fraud Rule Engine case study',
+    sourceHref: '/work/fraud-rule-engine/',
+  },
+  {
+    id: 'agent-risk-monitor',
+    prompt: 'How does the Agent Activity Risk Monitor work?',
+    keywords: ['agent', 'activity', 'risk', 'monitor', 'Fastify', 'TypeScript', 'Python', 'PostgreSQL', 'alerts'],
+    title: 'Agent events become idempotent, queryable alerts',
+    answer:
+      'The Agent Activity Risk Monitor uses Fastify for ingestion and reads, Python for five pure analysis rules, and PostgreSQL as the shared contract. Unique events and alerts plus concurrent row claiming keep retries and multiple analyzers safe.',
+    sourceLabel: 'Agent Activity Risk Monitor case study',
+    sourceHref: '/work/agent-risk-monitor/',
   },
   {
     id: 'experience',

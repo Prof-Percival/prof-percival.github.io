@@ -25,6 +25,8 @@ describe('verified portfolio guide', () => {
     expect(findGuideAnswers('AWS fleet orchestration')[0]?.id).toBe('cloud-delivery');
     expect(findGuideAnswers('backend APIs PostgreSQL')[0]?.id).toBe('back-end');
     expect(findGuideAnswers('Sepedi and Setswana')[0]?.id).toBe('languages');
+    expect(findGuideAnswers('transaction fraud scoring')[0]?.id).toBe('fraud-rule-engine');
+    expect(findGuideAnswers('agent activity alerts')[0]?.id).toBe('agent-risk-monitor');
   });
 
   it('respects the requested result limit', () => {

@@ -1,0 +1,130 @@
+---
+import { missingWorkflowStages, selectMissingWorkflowStage } from '../data/missing-workflow';
+import ArrowIcon from './ArrowIcon.astro';
+
+const initial = selectMissingWorkflowStage(0);
+---
+
+<section class="case-interactive shell" aria-labelledby="missing-workflow-title">
+  <header class="case-interactive__header">
+    <div>
+      <p class="eyebrow">Interactive workflow</p>
+      <h2 id="missing-workflow-title">Move one synthetic case from report to discovery.</h2>
+    </div>
+    <p>No real person, case, or image is used. Select any stage to inspect the boundary it owns.</p>
+  </header>
+
+  <div class="missing-workflow" data-missing-workflow>
+    <div class="missing-workflow__case">
+      <span>DEMO CASE</span>
+      <strong>MCSA-DEMO-014</strong>
+      <small>Synthetic record</small>
+    </div>
+
+    <div class="missing-workflow__track">
+      <div
+        class="missing-workflow__progress"
+        role="progressbar"
+        aria-label="Synthetic case workflow progress"
+        aria-valuemin="0"
+        aria-valuemax="100"
+        aria-valuenow={initial.progress}
+        style={`--workflow-progress: ${initial.progress}%`}
+        data-workflow-progress
+      ></div>
+      <ol>
+        {missingWorkflowStages.map((stage, index) => (
+          <li>
+            <button
+              type="button"
+              aria-current={index === 0 ? 'step' : undefined}
+              data-workflow-stage
+              data-index={index}
+            >
+              <span>{String(index + 1).padStart(2, '0')}</span>
+              {stage.label}
+            </button>
+          </li>
+        ))}
+      </ol>
+    </div>
+
+    <article class="missing-workflow__detail">
+      <p class="eyebrow" data-workflow-owner>
+        {initial.stage.owner}
+      </p>
+      <h3 data-workflow-title>{initial.stage.title}</h3>
+      <p data-workflow-detail>{initial.stage.detail}</p>
+      <div>
+        <span>Boundary</span>
+        <strong data-workflow-boundary>{initial.stage.boundary}</strong>
+      </div>
+    </article>
+
+    <div class="missing-workflow__actions">
+      <button class="button button--secondary" type="button" data-workflow-reset>
+        Reset case
+      </button>
+      <button class="button button--primary" type="button" data-workflow-next>
+        <span data-workflow-next-label>Move case forward</span> <ArrowIcon direction="right" />
+      </button>
+    </div>
+    <p class="form-status" role="status" aria-live="polite" aria-atomic="true" data-workflow-status>
+      Stage 1 of {missingWorkflowStages.length}: {initial.stage.label}.
+    </p>
+  </div>
+
+  <noscript>
+    <ol class="case-interactive__fallback">
+      {missingWorkflowStages.map((stage) => (
+        <li>
+          <strong>{stage.label}:</strong> {stage.boundary}
+        </li>
+      ))}
+    </ol>
+  </noscript>
+</section>
+
+<script>
+  import { missingWorkflowStages, selectMissingWorkflowStage } from '../data/missing-workflow';
+
+  document.querySelectorAll<HTMLElement>('[data-missing-workflow]').forEach((workflow) => {
+    const stageButtons = Array.from(workflow.querySelectorAll<HTMLButtonElement>('[data-workflow-stage]'));
+    const progress = workflow.querySelector<HTMLElement>('[data-workflow-progress]');
+    const owner = workflow.querySelector<HTMLElement>('[data-workflow-owner]');
+    const title = workflow.querySelector<HTMLElement>('[data-workflow-title]');
+    const detail = workflow.querySelector<HTMLElement>('[data-workflow-detail]');
+    const boundary = workflow.querySelector<HTMLElement>('[data-workflow-boundary]');
+    const next = workflow.querySelector<HTMLButtonElement>('[data-workflow-next]');
+    const nextLabel = workflow.querySelector<HTMLElement>('[data-workflow-next-label]');
+    const reset = workflow.querySelector<HTMLButtonElement>('[data-workflow-reset]');
+    const status = workflow.querySelector<HTMLElement>('[data-workflow-status]');
+    if (!progress || !owner || !title || !detail || !boundary || !next || !nextLabel || !reset || !status) return;
+
+    let selectedIndex = 0;
+    const select = (index: number) => {
+      const selected = selectMissingWorkflowStage(index);
+      selectedIndex = selected.index;
+      stageButtons.forEach((button, buttonIndex) => {
+        if (buttonIndex === selected.index) button.setAttribute('aria-current', 'step');
+        else button.removeAttribute('aria-current');
+      });
+      progress.style.setProperty('--workflow-progress', `${selected.progress}%`);
+      progress.setAttribute('aria-valuenow', String(selected.progress));
+      owner.textContent = selected.stage.owner;
+      title.textContent = selected.stage.title;
+      detail.textContent = selected.stage.detail;
+      boundary.textContent = selected.stage.boundary;
+      next.disabled = selected.isLast;
+      nextLabel.textContent = selected.isLast ? 'Workflow complete' : 'Move case forward';
+      status.textContent = selected.isLast
+        ? `Stage ${selected.index + 1} of ${missingWorkflowStages.length}: ${selected.stage.label}. The synthetic case is now at the public listing stage.`
+        : `Stage ${selected.index + 1} of ${missingWorkflowStages.length}: ${selected.stage.label}.`;
+    };
+
+    stageButtons.forEach((button) => button.addEventListener('click', () => select(Number(button.dataset.index))));
+    next.addEventListener('click', () => select(selectedIndex + 1));
+    reset.addEventListener('click', () => select(0));
+    select(0);
+  });
+</script>

@@ -280,7 +280,7 @@ test.describe('verified portfolio guide', () => {
 
     try {
       await page.goto('/guide/');
-      await expect(page.locator('[data-guide-answer]')).toHaveCount(9);
+      await expect(page.locator('[data-guide-answer]')).toHaveCount(11);
       await expect(page.getByRole('heading', { name: 'Start with Missing Children SA' })).toBeVisible();
       await expect(page.getByText(/All verified answers remain available/i)).toBeVisible();
     } finally {
@@ -297,11 +297,16 @@ test.describe('work route', () => {
   test('presents selected and earlier work on a focused route', async ({ page }) => {
     await expect(page).toHaveTitle('Work | Phadima Percival Maredi');
     await expect(page.getByRole('heading', { level: 1 })).toHaveText(/Systems with decisions/);
+    for (const [name, href] of [
+      ['Explore Missing Children SA', '/work/missing-children-sa/'],
+      ['Explore Fraud Rule Engine', '/work/fraud-rule-engine/'],
+      ['Explore Agent Activity Risk Monitor', '/work/agent-risk-monitor/'],
+    ]) {
+      await expect(page.getByRole('link', { name })).toHaveAttribute('href', href);
+    }
     await expect(page.getByRole('heading', { name: 'Missing Children SA' })).toBeVisible();
-    await expect(page.getByRole('link', { name: 'Read the case study' })).toHaveAttribute(
-      'href',
-      '/work/missing-children-sa/'
-    );
+    await expect(page.getByRole('heading', { name: 'Fraud Rule Engine' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Agent Activity Risk Monitor' })).toBeVisible();
 
     for (const title of [
       'SIC Data Analysis and Visualization',
@@ -344,6 +349,83 @@ test.describe('work route', () => {
       expect(imageBox!.y).toBeGreaterThanOrEqual(frameBox!.y);
       expect(imageBox!.y + imageBox!.height).toBeLessThanOrEqual(frameBox!.y + frameBox!.height);
     }
+  });
+
+  test('is accessible and contained', async ({ page }) => {
+    await expectAccessibleAndContained(page);
+  });
+});
+
+test.describe('Fraud Rule Engine case study', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/work/fraud-rule-engine/');
+  });
+
+  test('presents public-safe architecture and a six-chapter guide', async ({ page }) => {
+    await expect(page).toHaveTitle(/Fraud Rule Engine.*Case study.*Phadima Percival Maredi/);
+    await expect(page.getByRole('heading', { level: 1, name: 'Fraud Rule Engine' })).toBeVisible();
+    await expect(page.getByText('Private source', { exact: true })).toBeVisible();
+    await expect(page.getByText('Synthetic demo', { exact: true })).toBeVisible();
+    await expect(page.locator('[data-case-deck] [data-deck-tab]')).toHaveCount(6);
+
+    const deck = page.locator('[data-case-deck]');
+    await deck.getByRole('button', { name: /Constraints/ }).click();
+    await expect(deck.getByRole('heading', { name: /History, retries, and changing policy/ })).toBeVisible();
+    await expect(deck.getByRole('status')).toHaveText(/Chapter 2 of 6: Constraints/);
+  });
+
+  test('evaluates a stacked synthetic transaction with explainable outcomes', async ({ page }) => {
+    await expect(page.locator('[data-fraud-score]')).toHaveText('25');
+    await expect(page.locator('[data-fraud-decision]')).toHaveText('Approve');
+
+    await page.getByLabel('Amount in ZAR').fill('30000');
+    await page.getByLabel('Category').selectOption('Cryptocurrency');
+    await page.getByLabel('Merchant is on the deny list').check();
+    await page.getByLabel('Local hour').fill('2');
+    await page.getByLabel('Transactions in 15 minutes').fill('5');
+    await page.getByLabel('Implied travel speed in km/h').fill('1200');
+    await page.getByLabel('Baseline average in ZAR').fill('1000');
+    await page.getByRole('button', { name: 'Evaluate transaction' }).click();
+
+    await expect(page.locator('[data-fraud-score]')).toHaveText('100');
+    await expect(page.locator('[data-fraud-decision]')).toHaveText('Decline');
+    await expect(page.locator('[data-fraud-outcome][data-triggered="true"]')).toHaveCount(8);
+    await expect(page.getByRole('status').last()).toHaveText(/Score 100.*Decision Decline/);
+  });
+
+  test('is accessible and contained', async ({ page }) => {
+    await expectAccessibleAndContained(page);
+  });
+});
+
+test.describe('Agent Activity Risk Monitor case study', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/work/agent-risk-monitor/');
+  });
+
+  test('presents the cross-language system and guided decisions', async ({ page }) => {
+    await expect(page).toHaveTitle(/Agent Activity Risk Monitor.*Case study.*Phadima Percival Maredi/);
+    await expect(page.getByRole('heading', { level: 1, name: 'Agent Activity Risk Monitor' })).toBeVisible();
+    await expect(page.getByText('Private source', { exact: true })).toBeVisible();
+    await expect(page.locator('[data-case-deck] [data-deck-tab]')).toHaveCount(6);
+    await expect(page.getByText('47 unit tests', { exact: true })).toBeVisible();
+    await expect(page.getByText('38 end-to-end tests', { exact: true })).toBeVisible();
+  });
+
+  test('traces a duplicate synthetic event to one critical alert', async ({ page }) => {
+    await page.getByLabel('Synthetic activity event').selectOption('remote_code_execution');
+    await page.getByLabel('Send the same event twice').check();
+    await page.getByRole('button', { name: 'Run synthetic event' }).click();
+
+    await expect(page.locator('[data-agent-received]')).toHaveText('2');
+    await expect(page.locator('[data-agent-stored]')).toHaveText('1');
+    await expect(page.locator('[data-agent-alert-count]')).toHaveText('1');
+    await expect(page.locator('[data-agent-alert-severity]')).toHaveText('critical');
+    await expect(page.locator('[data-agent-alert-rule]')).toHaveText('remote_code_execution');
+    await expect(page.getByRole('status').last()).toHaveText(/critical alert raised/);
+
+    await page.locator('[data-agent-stage]').filter({ hasText: 'Alert' }).click();
+    await expect(page.locator('[data-agent-stage-detail]')).toHaveText(/written once.*unique/);
   });
 
   test('is accessible and contained', async ({ page }) => {
@@ -477,6 +559,24 @@ test.describe('Missing Children SA case study', () => {
     }
     await expect(page.getByRole('heading', { name: 'Moderation before visibility' })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'History that can be recovered' })).toBeVisible();
+    await expect(page.locator('[data-case-deck] [data-deck-tab]')).toHaveCount(6);
     await expectAccessibleAndContained(page);
+  });
+
+  test('moves a synthetic report through the controlled publication path', async ({ page }) => {
+    await page.goto('/work/missing-children-sa/');
+    const workflow = page.locator('[data-missing-workflow]');
+    await expect(workflow.getByRole('button', { name: /Submission/ })).toHaveAttribute('aria-current', 'step');
+
+    for (let index = 0; index < 4; index += 1) {
+      await workflow.getByRole('button', { name: 'Move case forward' }).click();
+    }
+
+    await expect(workflow.getByRole('button', { name: /Public listing/ })).toHaveAttribute('aria-current', 'step');
+    await expect(workflow.locator('[data-workflow-boundary]')).toHaveText(/no real person, report, or image/i);
+    await expect(workflow.getByRole('status')).toHaveText(/public listing stage/);
+
+    await workflow.getByRole('button', { name: 'Reset case' }).click();
+    await expect(workflow.getByRole('button', { name: /Submission/ })).toHaveAttribute('aria-current', 'step');
   });
 });

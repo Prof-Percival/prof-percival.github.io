@@ -1,0 +1,104 @@
+---
+import type { CaseStudyChapter } from '../data/flagships';
+import ArrowIcon from './ArrowIcon.astro';
+
+interface Props {
+  idPrefix: string;
+  title: string;
+  chapters: readonly CaseStudyChapter[];
+}
+
+const { idPrefix, title, chapters } = Astro.props;
+---
+
+<section class="case-deck shell" aria-labelledby={`${idPrefix}-deck-title`}>
+  <header class="case-deck__header">
+    <p class="eyebrow">Guided case study</p>
+    <h2 id={`${idPrefix}-deck-title`}>{title}</h2>
+    <p>Move through the reasoning in six short chapters, or read every chapter with JavaScript disabled.</p>
+  </header>
+
+  <div class="case-deck__workspace" data-case-deck>
+    <nav aria-label={`${title} chapters`}>
+      <ol>
+        {chapters.map((chapter, index) => (
+          <li>
+            <button
+              type="button"
+              aria-controls={`${idPrefix}-chapter-${chapter.id}`}
+              aria-pressed={index === 0 ? 'true' : 'false'}
+              data-deck-tab
+              data-index={index}
+            >
+              <span>{String(index + 1).padStart(2, '0')}</span>
+              {chapter.label}
+            </button>
+          </li>
+        ))}
+      </ol>
+    </nav>
+
+    <div class="case-deck__panel">
+      <div data-deck-chapters>
+        {chapters.map((chapter, index) => (
+          <article id={`${idPrefix}-chapter-${chapter.id}`} data-deck-chapter data-index={index}>
+            <p class="eyebrow">
+              {String(index + 1).padStart(2, '0')} / {chapter.label}
+            </p>
+            <h3>{chapter.title}</h3>
+            <p>{chapter.body}</p>
+          </article>
+        ))}
+      </div>
+      <footer class="case-deck__controls">
+        <button type="button" data-deck-previous>
+          <ArrowIcon direction="left" /> Previous
+        </button>
+        <p role="status" aria-live="polite" aria-atomic="true" data-deck-status>
+          Chapter 1 of {chapters.length}: {chapters[0]?.label}.
+        </p>
+        <button type="button" data-deck-next>
+          Next <ArrowIcon direction="right" />
+        </button>
+      </footer>
+    </div>
+  </div>
+  <noscript>
+    <p class="case-deck__noscript">The interactive controls need JavaScript, so all chapters are shown.</p>
+  </noscript>
+</section>
+
+<script>
+  const decks = document.querySelectorAll<HTMLElement>('[data-case-deck]');
+
+  decks.forEach((deck) => {
+    const tabs = Array.from(deck.querySelectorAll<HTMLButtonElement>('[data-deck-tab]'));
+    const chapters = Array.from(deck.querySelectorAll<HTMLElement>('[data-deck-chapter]'));
+    const previous = deck.querySelector<HTMLButtonElement>('[data-deck-previous]');
+    const next = deck.querySelector<HTMLButtonElement>('[data-deck-next]');
+    const status = deck.querySelector<HTMLElement>('[data-deck-status]');
+    if (tabs.length === 0 || chapters.length !== tabs.length || !previous || !next || !status) return;
+
+    let selectedIndex = 0;
+    const selectChapter = (index: number) => {
+      selectedIndex = Math.min(chapters.length - 1, Math.max(0, index));
+      tabs.forEach((tab, tabIndex) => {
+        const selected = tabIndex === selectedIndex;
+        tab.setAttribute('aria-pressed', String(selected));
+        if (selected) tab.setAttribute('aria-current', 'step');
+        else tab.removeAttribute('aria-current');
+      });
+      chapters.forEach((chapter, chapterIndex) => (chapter.hidden = chapterIndex !== selectedIndex));
+      previous.disabled = selectedIndex === 0;
+      next.disabled = selectedIndex === chapters.length - 1;
+      const label = tabs[selectedIndex]?.textContent?.trim().replace(/^\d+/, '').trim() ?? '';
+      status.textContent = `Chapter ${selectedIndex + 1} of ${chapters.length}: ${label}.`;
+    };
+
+    tabs.forEach((tab) => tab.addEventListener('click', () => selectChapter(Number(tab.dataset.index))));
+    previous.addEventListener('click', () => selectChapter(selectedIndex - 1));
+    next.addEventListener('click', () => selectChapter(selectedIndex + 1));
+    deck.dataset.enhanced = 'true';
+    selectChapter(0);
+  });
+</script>

@@ -1,0 +1,88 @@
+---
+import AppShell from '../../components/AppShell.astro';
+import ArrowIcon from '../../components/ArrowIcon.astro';
+import CaseStudyDeck from '../../components/CaseStudyDeck.astro';
+import FraudEvaluator from '../../components/FraudEvaluator.astro';
+import FraudRuleVisual from '../../components/FraudRuleVisual.astro';
+import { fraudRuleEngineCaseStudy as project } from '../../data/flagships';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title={`${project.title} | Case study | Phadima Percival Maredi`}
+  description={`${project.summary} A software engineering case study with a synthetic evaluator by Phadima Percival Maredi.`}
+>
+  <AppShell active="work">
+    <main id="main">
+      <article class="case-study case-study--fraud">
+        <header class="case-study__hero shell">
+          <a class="text-link case-study__back" href="/work/">
+            <ArrowIcon direction="left" /> Back to flagship systems
+          </a>
+          <p class="eyebrow">Case study / {project.eyebrow}</p>
+          <h1>{project.title}</h1>
+          <p class="case-study__summary">{project.summary}</p>
+          <div class="case-study__badges">
+            <span>{project.sourceLabel}</span>
+            <span>Synthetic demo</span>
+          </div>
+          <ul class="case-study__facts" aria-label="Fraud Rule Engine facts">
+            {project.facts.map((fact) => (
+              <li>{fact}</li>
+            ))}
+          </ul>
+          <ul class="tag-list" aria-label="Fraud Rule Engine technologies">
+            {project.stack.map((item) => (
+              <li>{item}</li>
+            ))}
+          </ul>
+        </header>
+
+        <div class="case-study__visual shell">
+          <FraudRuleVisual />
+        </div>
+        <CaseStudyDeck
+          idPrefix="fraud"
+          title="Follow an assessment from signal to explanation."
+          chapters={project.chapters}
+        />
+        <FraudEvaluator />
+
+        <div class="case-study__body shell">
+          <section aria-labelledby="fraud-challenge-title">
+            <p class="eyebrow">01 / Engineering problem</p>
+            <h2 id="fraud-challenge-title">Context changes what a transaction means.</h2>
+            <p>{project.challenge}</p>
+          </section>
+          <section aria-labelledby="fraud-decisions-title">
+            <p class="eyebrow">02 / Durable decisions</p>
+            <h2 id="fraud-decisions-title">The explanation is part of the result.</h2>
+            <p>{project.contribution}</p>
+            <div class="decision-list">
+              {project.decisions.map((decision, index) => (
+                <article>
+                  <span>{String(index + 1).padStart(2, '0')}</span>
+                  <div>
+                    <h3>{decision.title}</h3>
+                    <p>{decision.detail}</p>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </section>
+          <section class="case-study__closing" aria-labelledby="fraud-closing-title">
+            <p class="eyebrow">03 / What this demonstrates</p>
+            <h2 id="fraud-closing-title">Back-end decisions that remain inspectable under change.</h2>
+            <p>
+              The system joins domain modelling, persistence, security, observability, and tests around one rule: a
+              decision should carry enough evidence to explain itself.
+            </p>
+            <a class="button button--primary" href="/profile/#contact">
+              Discuss an explainable service <ArrowIcon />
+            </a>
+          </section>
+        </div>
+      </article>
+    </main>
+  </AppShell>
+</BaseLayout>

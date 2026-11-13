@@ -1,0 +1,84 @@
+---
+import AgentRiskPipeline from '../../components/AgentRiskPipeline.astro';
+import AgentRiskVisual from '../../components/AgentRiskVisual.astro';
+import AppShell from '../../components/AppShell.astro';
+import ArrowIcon from '../../components/ArrowIcon.astro';
+import CaseStudyDeck from '../../components/CaseStudyDeck.astro';
+import { agentRiskMonitorCaseStudy as project } from '../../data/flagships';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title={`${project.title} | Case study | Phadima Percival Maredi`}
+  description={`${project.summary} A software engineering case study with a synthetic event pipeline by Phadima Percival Maredi.`}
+>
+  <AppShell active="work">
+    <main id="main">
+      <article class="case-study case-study--agent">
+        <header class="case-study__hero shell">
+          <a class="text-link case-study__back" href="/work/">
+            <ArrowIcon direction="left" /> Back to flagship systems
+          </a>
+          <p class="eyebrow">Case study / {project.eyebrow}</p>
+          <h1>{project.title}</h1>
+          <p class="case-study__summary">{project.summary}</p>
+          <div class="case-study__badges">
+            <span>{project.sourceLabel}</span>
+            <span>Synthetic demo</span>
+          </div>
+          <ul class="case-study__facts" aria-label="Agent Activity Risk Monitor facts">
+            {project.facts.map((fact) => (
+              <li>{fact}</li>
+            ))}
+          </ul>
+          <ul class="tag-list" aria-label="Agent Activity Risk Monitor technologies">
+            {project.stack.map((item) => (
+              <li>{item}</li>
+            ))}
+          </ul>
+        </header>
+
+        <div class="case-study__visual shell">
+          <AgentRiskVisual />
+        </div>
+        <CaseStudyDeck idPrefix="agent" title="Follow one event across two services." chapters={project.chapters} />
+        <AgentRiskPipeline />
+
+        <div class="case-study__body shell">
+          <section aria-labelledby="agent-challenge-title">
+            <p class="eyebrow">01 / Engineering problem</p>
+            <h2 id="agent-challenge-title">Retries and concurrency cannot change the evidence.</h2>
+            <p>{project.challenge}</p>
+          </section>
+          <section aria-labelledby="agent-decisions-title">
+            <p class="eyebrow">02 / Durable decisions</p>
+            <h2 id="agent-decisions-title">The database carries the cross-language guarantees.</h2>
+            <p>{project.contribution}</p>
+            <div class="decision-list">
+              {project.decisions.map((decision, index) => (
+                <article>
+                  <span>{String(index + 1).padStart(2, '0')}</span>
+                  <div>
+                    <h3>{decision.title}</h3>
+                    <p>{decision.detail}</p>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </section>
+          <section class="case-study__closing" aria-labelledby="agent-closing-title">
+            <p class="eyebrow">03 / What this demonstrates</p>
+            <h2 id="agent-closing-title">A system boundary shared without hiding the trade-offs.</h2>
+            <p>
+              The monitor connects TypeScript, Python, SQL, concurrency control, validation, and operations while
+              keeping every public interaction synthetic and safe.
+            </p>
+            <a class="button button--primary" href="/profile/#contact">
+              Discuss a monitoring system <ArrowIcon />
+            </a>
+          </section>
+        </div>
+      </article>
+    </main>
+  </AppShell>
+</BaseLayout>

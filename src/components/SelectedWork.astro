@@ -1,6 +1,9 @@
 ---
-import { missingChildrenCaseStudy as project } from '../data/portfolio';
+import { agentRiskMonitorCaseStudy, fraudRuleEngineCaseStudy } from '../data/flagships';
+import { missingChildrenCaseStudy as missingChildren } from '../data/portfolio';
+import AgentRiskVisual from './AgentRiskVisual.astro';
 import ArrowIcon from './ArrowIcon.astro';
+import FraudRuleVisual from './FraudRuleVisual.astro';
 import MissingChildrenVisual from './MissingChildrenVisual.astro';
 import SectionHeading from './SectionHeading.astro';
 ---
@@ -8,27 +11,82 @@ import SectionHeading from './SectionHeading.astro';
 <section class="section work-section shell" id="work" aria-labelledby="work-title">
   <SectionHeading
     number="01"
-    eyebrow="Selected work"
+    eyebrow="Flagship systems"
     id="work-title"
-    title="Systems with a reason behind every decision."
-    introduction="A closer look at work where product needs, service boundaries, data, and the people operating the system all matter."
+    title="Three systems with decisions you can inspect."
+    introduction="Each case study pairs architecture and trade-offs with a safe, synthetic interaction that makes the system boundary tangible."
   />
 
-  <article class="featured-project">
-    <div class="featured-project__copy">
-      <p class="project-index">01 / {project.eyebrow}</p>
-      <h3>{project.title}</h3>
-      <p class="featured-project__lead">{project.summary}</p>
-      <p>{project.contribution}</p>
-      <ul class="tag-list" aria-label="Missing Children SA technologies">
-        {project.stack.slice(0, 6).map((item) => (
-          <li>{item}</li>
-        ))}
-      </ul>
-      <a class="text-link" href={`/work/${project.slug}/`} data-track="missing-children-case-study">
-        Read the case study <ArrowIcon />
-      </a>
+  <div class="flagship-showcase">
+    <article class="featured-project">
+      <div class="featured-project__copy">
+        <div class="project-meta">
+          <p class="project-index">01 / {missingChildren.eyebrow}</p>
+          <span class="project-access">Private source</span>
+        </div>
+        <h3>{missingChildren.title}</h3>
+        <p class="featured-project__lead">{missingChildren.summary}</p>
+        <p>{missingChildren.contribution}</p>
+        <ul class="tag-list" aria-label="Missing Children SA technologies">
+          {missingChildren.stack.slice(0, 6).map((item) => (
+            <li>{item}</li>
+          ))}
+        </ul>
+        <a class="text-link" href={`/work/${missingChildren.slug}/`} data-track="missing-children-case-study">
+          Explore Missing Children SA <ArrowIcon />
+        </a>
+      </div>
+      <MissingChildrenVisual />
+    </article>
+
+    <div class="flagship-pair">
+      <article class="flagship-card">
+        <FraudRuleVisual />
+        <div class="flagship-card__copy">
+          <div class="project-meta">
+            <p class="project-index">02 / {fraudRuleEngineCaseStudy.eyebrow}</p>
+            <span class="project-access">{fraudRuleEngineCaseStudy.sourceLabel}</span>
+          </div>
+          <h3>{fraudRuleEngineCaseStudy.title}</h3>
+          <p>{fraudRuleEngineCaseStudy.summary}</p>
+          <ul class="tag-list" aria-label="Fraud Rule Engine technologies">
+            {fraudRuleEngineCaseStudy.stack.slice(0, 5).map((item) => (
+              <li>{item}</li>
+            ))}
+          </ul>
+          <a
+            class="text-link"
+            href={`/work/${fraudRuleEngineCaseStudy.slug}/`}
+            data-track="fraud-rule-engine-case-study"
+          >
+            Explore Fraud Rule Engine <ArrowIcon />
+          </a>
+        </div>
+      </article>
+
+      <article class="flagship-card">
+        <AgentRiskVisual />
+        <div class="flagship-card__copy">
+          <div class="project-meta">
+            <p class="project-index">03 / {agentRiskMonitorCaseStudy.eyebrow}</p>
+            <span class="project-access">{agentRiskMonitorCaseStudy.sourceLabel}</span>
+          </div>
+          <h3>{agentRiskMonitorCaseStudy.title}</h3>
+          <p>{agentRiskMonitorCaseStudy.summary}</p>
+          <ul class="tag-list" aria-label="Agent Activity Risk Monitor technologies">
+            {agentRiskMonitorCaseStudy.stack.slice(0, 5).map((item) => (
+              <li>{item}</li>
+            ))}
+          </ul>
+          <a
+            class="text-link"
+            href={`/work/${agentRiskMonitorCaseStudy.slug}/`}
+            data-track="agent-risk-monitor-case-study"
+          >
+            Explore Agent Activity Risk Monitor <ArrowIcon />
+          </a>
+        </div>
+      </article>
     </div>
-    <MissingChildrenVisual />
-  </article>
+  </div>
 </section>

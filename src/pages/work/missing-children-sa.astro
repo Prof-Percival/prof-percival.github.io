@@ -1,9 +1,12 @@
 ---
 import AppShell from '../../components/AppShell.astro';
 import ArrowIcon from '../../components/ArrowIcon.astro';
+import CaseStudyDeck from '../../components/CaseStudyDeck.astro';
 import MissingChildrenVisual from '../../components/MissingChildrenVisual.astro';
-import BaseLayout from '../../layouts/BaseLayout.astro';
+import MissingChildrenWorkflow from '../../components/MissingChildrenWorkflow.astro';
+import { missingChildrenChapters } from '../../data/flagships';
 import { missingChildrenCaseStudy as project } from '../../data/portfolio';
+import BaseLayout from '../../layouts/BaseLayout.astro';
 ---
 
 <BaseLayout
@@ -20,6 +23,10 @@ import { missingChildrenCaseStudy as project } from '../../data/portfolio';
           <p class="eyebrow">Case study / {project.eyebrow}</p>
           <h1>{project.title}</h1>
           <p class="case-study__summary">{project.summary}</p>
+          <div class="case-study__badges">
+            <span>Private source</span>
+            <span>Synthetic demo</span>
+          </div>
           <ul class="tag-list" aria-label="Project technologies">
             {project.stack.map((item) => (
               <li>{item}</li>
@@ -30,6 +37,13 @@ import { missingChildrenCaseStudy as project } from '../../data/portfolio';
         <div class="case-study__visual shell">
           <MissingChildrenVisual />
         </div>
+
+        <CaseStudyDeck
+          idPrefix="missing-children"
+          title="Follow a report from submission to approved visibility."
+          chapters={missingChildrenChapters}
+        />
+        <MissingChildrenWorkflow />
 
         <div class="case-study__body shell">
           <section aria-labelledby="challenge-title">
