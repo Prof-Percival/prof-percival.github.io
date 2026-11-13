@@ -1,0 +1,80 @@
+---
+interface Props {
+  alt: string;
+}
+
+const { alt } = Astro.props;
+---
+
+<div class="sic-visual" role="img" aria-label={alt}>
+  <div class="sic-visual__header" aria-hidden="true">
+    <span>ZA / SOCIAL INDICATORS</span>
+    <small>ANALYSIS NOTEBOOK · 2022</small>
+  </div>
+
+  <div class="sic-visual__workspace" aria-hidden="true">
+    <div class="sic-visual__themes">
+      <div class="sic-visual__theme">
+        <span>01</span>
+        <strong>Unemployment</strong>
+      </div>
+      <div class="sic-visual__theme">
+        <span>02</span>
+        <strong>Poverty</strong>
+      </div>
+      <div class="sic-visual__theme">
+        <span>03</span>
+        <strong>Crime</strong>
+      </div>
+    </div>
+
+    <div class="sic-visual__chart">
+      <div class="sic-visual__chart-label">
+        <span>Relationship view</span>
+        <small>Patterns before conclusions</small>
+      </div>
+      <svg viewBox="0 0 640 300" preserveAspectRatio="none">
+        <g class="sic-visual__grid">
+          <path d="M0 60H640M0 120H640M0 180H640M0 240H640"></path>
+          <path d="M80 0V300M160 0V300M240 0V300M320 0V300M400 0V300M480 0V300M560 0V300"></path>
+        </g>
+        <g class="sic-visual__bars">
+          <rect x="36" y="220" width="28" height="48" rx="4"></rect>
+          <rect x="76" y="188" width="28" height="80" rx="4"></rect>
+          <rect x="116" y="206" width="28" height="62" rx="4"></rect>
+          <rect x="516" y="198" width="28" height="70" rx="4"></rect>
+          <rect x="556" y="156" width="28" height="112" rx="4"></rect>
+          <rect x="596" y="180" width="28" height="88" rx="4"></rect>
+        </g>
+        <path
+          class="sic-visual__line sic-visual__line--primary"
+          d="M24 214C84 204 116 132 178 146S270 226 336 184 422 76 486 102 550 168 620 62"
+        ></path>
+        <path
+          class="sic-visual__line sic-visual__line--secondary"
+          d="M24 250C96 240 124 206 190 218S286 118 350 136 444 208 506 174 568 112 620 128"
+        ></path>
+        <g class="sic-visual__points">
+          <circle cx="178" cy="146" r="6"></circle>
+          <circle cx="336" cy="184" r="6"></circle>
+          <circle cx="486" cy="102" r="6"></circle>
+          <circle cx="190" cy="218" r="5"></circle>
+          <circle cx="350" cy="136" r="5"></circle>
+          <circle cx="506" cy="174" r="5"></circle>
+        </g>
+      </svg>
+      <div class="sic-visual__questions">
+        <span>Explore context</span>
+        <span>Compare patterns</span>
+        <span>Frame responses</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="sic-visual__footer" aria-hidden="true">
+    <span>Python</span>
+    <span>Pandas</span>
+    <span>Jupyter</span>
+    <span>Data visualization</span>
+  </div>
+</div>

@@ -59,6 +59,26 @@ test.describe('home page', () => {
     ]) {
       await expect(page.getByRole('heading', { name: title, exact: true })).toBeVisible();
     }
+
+    const sicCard = page
+      .getByRole('article')
+      .filter({ has: page.getByRole('heading', { name: 'SIC Data Analysis and Visualization', exact: true }) });
+    await expect(sicCard.getByRole('img', { name: /data-analysis view/i })).toBeVisible();
+    await expect(sicCard.locator('img')).toHaveCount(0);
+  });
+
+  test('gives the SIC visualization deliberate use of its frame', async ({ page, isMobile }) => {
+    test.skip(isMobile, 'The wide project card uses a stacked layout on mobile.');
+    const sicCard = page
+      .getByRole('article')
+      .filter({ has: page.getByRole('heading', { name: 'SIC Data Analysis and Visualization', exact: true }) });
+    const frame = await sicCard.locator('.project-card__image').boundingBox();
+    const visual = await sicCard.getByRole('img', { name: /data-analysis view/i }).boundingBox();
+
+    expect(frame).not.toBeNull();
+    expect(visual).not.toBeNull();
+    expect(visual!.width / frame!.width).toBeGreaterThan(0.85);
+    expect(visual!.height / frame!.height).toBeGreaterThan(0.85);
   });
 
   test('uses the general software-engineer identity while preserving the exact current role', async ({ page }) => {

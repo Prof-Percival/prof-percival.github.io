@@ -228,7 +228,7 @@ export const earlierProjects: EarlierProject[] = [
     summary:
       'A Python analysis of unemployment, poverty, and crime in South Africa, exploring where technology could support practical responses.',
     stack: ['Python', 'Pandas', 'Jupyter', 'Data visualization'],
-    alt: 'A collage introducing a South African data analysis project about crime, unemployment, and poverty',
+    alt: 'Abstract data-analysis view connecting unemployment, poverty, and crime themes in South Africa',
   },
   {
     id: 'mmea',

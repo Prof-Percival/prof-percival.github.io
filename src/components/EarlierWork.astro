@@ -6,12 +6,11 @@ import contactsImage from '../assets/projects/contacts-management.png';
 import crsImage from '../assets/projects/crs-rentals.png';
 import matrixImage from '../assets/projects/matrix-multiplication.webp';
 import mmeaImage from '../assets/projects/mmea.png';
-import sicImage from '../assets/projects/sic-data-analysis.jpg';
 import { earlierProjects, type EarlierProject } from '../data/portfolio';
 import SectionHeading from './SectionHeading.astro';
+import SicDataVisual from './SicDataVisual.astro';
 
-const images: Record<EarlierProject['id'], ImageMetadata> = {
-  sic: sicImage,
+const images: Record<Exclude<EarlierProject['id'], 'sic'>, ImageMetadata> = {
   mmea: mmeaImage,
   crs: crsImage,
   contacts: contactsImage,
@@ -32,15 +31,19 @@ const images: Record<EarlierProject['id'], ImageMetadata> = {
     {earlierProjects.map((project, index) => (
       <article class:list={['project-card', index === 0 && 'project-card--wide']}>
         <div class="project-card__image">
-          <Image
-            src={images[project.id]}
-            alt={project.alt}
-            widths={[320, 480, 720]}
-            sizes={index === 0 ? '(min-width: 760px) 54vw, 100vw' : '(min-width: 760px) 28vw, 100vw'}
-            format="webp"
-            loading="lazy"
-            quality={82}
-          />
+          {project.id === 'sic' ? (
+            <SicDataVisual alt={project.alt} />
+          ) : (
+            <Image
+              src={images[project.id]}
+              alt={project.alt}
+              widths={[320, 480, 720]}
+              sizes="(min-width: 760px) 28vw, 100vw"
+              format="webp"
+              loading="lazy"
+              quality={82}
+            />
+          )}
           <span>{String(index + 1).padStart(2, '0')}</span>
         </div>
         <div class="project-card__body">
