@@ -1,25 +1,41 @@
 ---
-import { certifications, community, languages, linkedInCertificationCount } from '../data/portfolio';
+import {
+  certificatePreviews,
+  certifications,
+  community,
+  languages,
+  linkedInCertificationCount,
+} from '../data/portfolio';
 import { site } from '../data/site';
 import ArrowIcon from './ArrowIcon.astro';
 
-const certificationGroups = [
-  {
-    id: 'recent',
-    eyebrow: '01 / Recent',
-    title: 'Recent eight',
-    description: 'Eight recent certifications spanning AI, software engineering, leadership, and technology.',
-    start: 1,
-    items: certifications.filter((certification) => certification.group === 'recent'),
-  },
-  {
-    id: 'selected',
-    eyebrow: '02 / Selected for range',
-    title: 'Ten complementary certifications',
-    description: 'A cross-section of back-end, full-stack, cloud, data, security, and accessibility learning.',
-    start: 9,
-    items: certifications.filter((certification) => certification.group === 'selected'),
-  },
+type CertificationRecord = (typeof certifications)[number];
+type CertificationWithPreview = Extract<CertificationRecord, { readonly previewSlug: string }>;
+type CertificationWithUrl = Extract<CertificationRecord, { readonly url: string }>;
+type CertificationFocus = 'ai-software' | 'cloud-data' | 'security-accessibility' | 'leadership';
+
+const featuredCertifications = certificatePreviews.map((preview) => {
+  const certification = certifications.find(
+    (item): item is CertificationWithPreview => 'previewSlug' in item && item.previewSlug === preview.slug
+  );
+  if (!certification) throw new Error(`Missing certification for preview: ${preview.slug}`);
+  return { certification, preview };
+});
+const certificationHighlights = certifications.filter(
+  (certification): certification is CertificationWithUrl => 'url' in certification
+);
+const certificationFocus = (category: string): CertificationFocus => {
+  if (category === 'Leadership') return 'leadership';
+  if (category === 'Cloud' || category === 'Data') return 'cloud-data';
+  if (category === 'Security' || category === 'Accessibility') return 'security-accessibility';
+  return 'ai-software';
+};
+const certificationFilters = [
+  { id: 'all', label: 'All' },
+  { id: 'ai-software', label: 'AI and software' },
+  { id: 'cloud-data', label: 'Cloud and data' },
+  { id: 'security-accessibility', label: 'Security and accessibility' },
+  { id: 'leadership', label: 'Leadership' },
 ] as const;
 ---
 
@@ -32,53 +48,137 @@ const certificationGroups = [
         <p>Eighteen shown from {linkedInCertificationCount}+ certifications listed on LinkedIn.</p>
       </div>
     </div>
-    <div class="credential-groups">
-      {certificationGroups.map((group) => (
-        <section class="credential-group" aria-labelledby={`credential-group-${group.id}`}>
-          <header class="credential-group__header">
-            <div>
-              <p class="eyebrow">{group.eyebrow}</p>
-              <h4 id={`credential-group-${group.id}`}>{group.title}</h4>
-            </div>
-            <p>{group.description}</p>
-          </header>
-          <div class="credential-grid" data-certification-group={group.id}>
-            {group.items.map((credential, index) => (
-              <a
-                href={'url' in credential ? credential.url : `/certificates/${credential.previewSlug}/`}
-                target={'url' in credential ? '_blank' : undefined}
-                rel={'url' in credential ? 'noopener noreferrer' : undefined}
-                data-track={'url' in credential ? 'credential-open' : 'certificate-preview-open'}
-                data-credential-source={'url' in credential ? 'issuer' : 'portfolio'}
+
+    <div class="certification-showcase" data-certifications>
+      <div class="certification-filter" data-certification-filter hidden>
+        <div>
+          <p class="eyebrow">Explore by focus</p>
+          <div class="certification-filter__buttons" role="group" aria-label="Filter certifications by focus">
+            {certificationFilters.map((filter, index) => (
+              <button
+                type="button"
+                aria-pressed={index === 0 ? 'true' : 'false'}
+                data-certification-filter-button={filter.id}
               >
-                <span class="credential-card__number">{String(group.start + index).padStart(2, '0')}</span>
-                <div class="credential-card__copy">
-                  <span class="credential-card__category">{credential.category}</span>
-                  <strong>{credential.title}</strong>
-                  <small>
-                    {credential.issuer} · {credential.issued}
-                  </small>
-                </div>
-                <ArrowIcon direction={'url' in credential ? 'up-right' : 'right'} />
-                <span class="sr-only">
-                  {'url' in credential ? 'Verify credential. (opens in a new tab)' : 'View certificate preview.'}
-                </span>
-              </a>
+                {filter.label}
+              </button>
             ))}
           </div>
-        </section>
-      ))}
+        </div>
+        <p role="status" aria-live="polite" aria-atomic="true" data-certification-status>
+          Showing all {certifications.length} certifications.
+        </p>
+      </div>
+
+      <section
+        class="featured-certificates"
+        aria-labelledby="featured-certificates-title"
+        data-certification-section="featured"
+      >
+        <header class="credential-group__header">
+          <div>
+            <p class="eyebrow">Certificate previews</p>
+            <h4 id="featured-certificates-title">Four documents you can inspect here.</h4>
+          </div>
+          <p>Open a locally hosted preview, view it at full resolution, or download the supplied image.</p>
+        </header>
+        <div class="certificate-feature-grid">
+          {featuredCertifications.map(({ certification, preview }, index) => (
+            <a
+              class="certificate-feature-card"
+              href={`/certificates/${preview.slug}/`}
+              data-track="certificate-preview-open"
+              data-credential-source="portfolio"
+              data-certification-card
+              data-certification-focus={certificationFocus(certification.category)}
+              data-certification-title={certification.title}
+              data-recent={certification.group === 'recent' ? '' : undefined}
+            >
+              <div class="certificate-feature-card__media">
+                <img
+                  src={preview.image}
+                  width={preview.width}
+                  height={preview.height}
+                  alt=""
+                  loading="lazy"
+                  decoding="async"
+                />
+              </div>
+              <div class="certificate-feature-card__body">
+                <div class="credential-card__labels">
+                  <span class="credential-card__category">{certification.category}</span>
+                  {certification.group === 'recent' && <span class="credential-card__recent">Recent</span>}
+                </div>
+                <span class="credential-card__number">{String(index + 1).padStart(2, '0')}</span>
+                <h5>{certification.title}</h5>
+                <small>
+                  {certification.issuer} · {certification.issued}
+                </small>
+                <span class="certificate-feature-card__action">
+                  View certificate <ArrowIcon direction="right" />
+                </span>
+              </div>
+            </a>
+          ))}
+        </div>
+      </section>
+
+      <section
+        class="certification-highlights"
+        aria-labelledby="certification-highlights-title"
+        data-certification-section="highlights"
+      >
+        <header class="credential-group__header">
+          <div>
+            <p class="eyebrow">Certification highlights</p>
+            <h4 id="certification-highlights-title">Fourteen more signals of range.</h4>
+          </div>
+          <p>Issuer-verified learning across software, cloud, data, security, accessibility, and AI.</p>
+        </header>
+        <div class="credential-grid">
+          {certificationHighlights.map((certification, index) => (
+            <a
+              href={certification.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              data-track="credential-open"
+              data-credential-source="issuer"
+              data-certification-card
+              data-certification-focus={certificationFocus(certification.category)}
+              data-certification-title={certification.title}
+              data-recent={certification.group === 'recent' ? '' : undefined}
+            >
+              <span class="credential-card__number">
+                {String(featuredCertifications.length + index + 1).padStart(2, '0')}
+              </span>
+              <div class="credential-card__copy">
+                <div class="credential-card__labels">
+                  <span class="credential-card__category">{certification.category}</span>
+                  {certification.group === 'recent' && <span class="credential-card__recent">Recent</span>}
+                </div>
+                <strong>{certification.title}</strong>
+                <small>
+                  {certification.issuer} · {certification.issued}
+                </small>
+              </div>
+              <ArrowIcon />
+              <span class="sr-only">Verify credential. (opens in a new tab)</span>
+            </a>
+          ))}
+        </div>
+      </section>
+
+      <a
+        class="text-link credentials__all"
+        href={site.links.linkedin}
+        target="_blank"
+        rel="noopener noreferrer"
+        data-track="linkedin-credentials"
+      >
+        View all certifications on LinkedIn <ArrowIcon />
+        <span class="sr-only">(opens in a new tab)</span>
+      </a>
     </div>
-    <a
-      class="text-link credentials__all"
-      href={site.links.linkedin}
-      target="_blank"
-      rel="noopener noreferrer"
-      data-track="linkedin-credentials"
-    >
-      View all certifications on LinkedIn <ArrowIcon />
-      <span class="sr-only">(opens in a new tab)</span>
-    </a>
   </section>
 
   <div class="profile-details__secondary">
@@ -115,3 +215,39 @@ const certificationGroups = [
     </section>
   </div>
 </div>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-certifications]').forEach((showcase) => {
+    const filter = showcase.querySelector<HTMLElement>('[data-certification-filter]');
+    const buttons = Array.from(showcase.querySelectorAll<HTMLButtonElement>('[data-certification-filter-button]'));
+    const cards = Array.from(showcase.querySelectorAll<HTMLElement>('[data-certification-card]'));
+    const sections = Array.from(showcase.querySelectorAll<HTMLElement>('[data-certification-section]'));
+    const status = showcase.querySelector<HTMLElement>('[data-certification-status]');
+    if (!filter || buttons.length === 0 || cards.length === 0 || sections.length === 0 || !status) return;
+
+    const applyFilter = (focus: string, label: string) => {
+      cards.forEach((card) => {
+        card.hidden = focus !== 'all' && card.dataset.certificationFocus !== focus;
+      });
+      sections.forEach((section) => {
+        section.hidden = !section.querySelector('[data-certification-card]:not([hidden])');
+      });
+      buttons.forEach((button) =>
+        button.setAttribute('aria-pressed', String(button.dataset.certificationFilterButton === focus))
+      );
+      const visibleCount = cards.filter((card) => !card.hidden).length;
+      status.textContent =
+        focus === 'all'
+          ? `Showing all ${visibleCount} certifications.`
+          : `Showing ${visibleCount} of ${cards.length} certifications in ${label}.`;
+    };
+
+    buttons.forEach((button) =>
+      button.addEventListener('click', () =>
+        applyFilter(button.dataset.certificationFilterButton ?? 'all', button.textContent?.trim() ?? 'All')
+      )
+    );
+    filter.hidden = false;
+    showcase.dataset.enhanced = 'true';
+  });
+</script>

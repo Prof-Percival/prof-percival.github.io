@@ -557,12 +557,15 @@ test.describe('profile route', () => {
       await expect(page.getByRole('link', { name: new RegExp(credential) })).toBeVisible();
     }
     await expect(page.getByText('Eighteen shown from 114+ certifications listed on LinkedIn.')).toBeVisible();
-    await expect(page.getByRole('heading', { level: 4, name: 'Recent eight' })).toBeVisible();
-    await expect(page.getByRole('heading', { level: 4, name: 'Ten complementary certifications' })).toBeVisible();
-    await expect(page.locator('[data-certification-group="recent"] > a')).toHaveCount(8);
-    await expect(page.locator('[data-certification-group="selected"] > a')).toHaveCount(10);
+    await expect(page.getByRole('heading', { level: 4, name: 'Four documents you can inspect here.' })).toBeVisible();
+    await expect(page.getByRole('heading', { level: 4, name: 'Fourteen more signals of range.' })).toBeVisible();
+    await expect(page.locator('[data-certification-card]')).toHaveCount(18);
+    await expect(page.locator('.certificate-feature-card')).toHaveCount(4);
+    await expect(page.locator('.credential-grid > a')).toHaveCount(14);
     await expect(page.locator('.credential-card__category')).toHaveCount(18);
+    await expect(page.locator('.credential-card__recent')).toHaveCount(8);
     await expect(page.locator('[data-credential-source="portfolio"]')).toHaveCount(4);
+    await expect(page.locator('[data-credential-source="issuer"]')).toHaveCount(14);
     for (const [title, href] of [
       ['From Prototype toward Production with AgentCore', '/certificates/agentcore/'],
       ['Building Generative AI Solutions - OLX', '/certificates/building-generative-ai-solutions/'],
@@ -575,7 +578,7 @@ test.describe('profile route', () => {
     }
     expect(
       await page
-        .locator('.credential-grid > a')
+        .locator('[data-certification-card]')
         .evaluateAll((links) =>
           links
             .map((link) => (link as HTMLAnchorElement).href)
@@ -594,9 +597,49 @@ test.describe('profile route', () => {
     for (const language of ['Sepedi', 'English', 'Sesotho', 'Setswana', 'IsiXhosa', 'IsiZulu']) {
       await expect(page.locator('.language-list dt').filter({ hasText: new RegExp(`^${language}$`) })).toBeVisible();
     }
-    await expect(page.getByRole('heading', { name: 'Peer Buddy' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Peer Buddy', exact: true })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Student Intern' })).toBeVisible();
     await expectAccessibleAndContained(page);
+  });
+
+  test('filters certification highlights without hiding the default evidence set', async ({ page }) => {
+    await page.goto('/profile/');
+    const showcase = page.locator('[data-certifications]');
+    const filters = showcase.getByRole('group', { name: 'Filter certifications by focus' });
+    await expect(filters.getByRole('button')).toHaveCount(5);
+    await expect(showcase.locator('[data-certification-card]:visible')).toHaveCount(18);
+
+    await filters.getByRole('button', { name: 'Cloud and data' }).click();
+    await expect(showcase.locator('[data-certification-card]:visible')).toHaveCount(3);
+    await expect(showcase.locator('[data-certification-section="featured"]')).toBeHidden();
+    await expect(showcase.getByRole('status')).toHaveText('Showing 3 of 18 certifications in Cloud and data.');
+
+    await filters.getByRole('button', { name: 'Leadership' }).click();
+    await expect(showcase.locator('[data-certification-card]:visible')).toHaveCount(1);
+    await expect(showcase.locator('[data-certification-section="featured"]')).toBeVisible();
+    await expect(showcase.locator('[data-certification-section="highlights"]')).toBeHidden();
+
+    await filters.getByRole('button', { name: 'All', exact: true }).click();
+    await expect(showcase.locator('[data-certification-card]:visible')).toHaveCount(18);
+    await expect(showcase.getByRole('status')).toHaveText('Showing all 18 certifications.');
+    await expectAccessibleAndContained(page);
+  });
+
+  test('keeps all certification highlights available without JavaScript', async ({ browser }) => {
+    const context = await browser.newContext({
+      baseURL: 'http://127.0.0.1:4321',
+      javaScriptEnabled: false,
+    });
+    const page = await context.newPage();
+
+    try {
+      await page.goto('/profile/');
+      await expect(page.locator('[data-certification-filter]')).toBeHidden();
+      await expect(page.locator('[data-certification-card]')).toHaveCount(18);
+      await expect(page.locator('[data-certification-card]:visible')).toHaveCount(18);
+    } finally {
+      await context.close();
+    }
   });
 
   test('adapts credential cards to their available section width', async ({ page, isMobile }) => {
@@ -606,7 +649,7 @@ test.describe('profile route', () => {
       await page.setViewportSize({ width, height: 900 });
       await page.goto('/profile/');
       return page
-        .locator('.credential-grid')
+        .locator('.certificate-feature-grid, .credential-grid')
         .evaluateAll((grids) => grids.map((grid) => getComputedStyle(grid).gridTemplateColumns.split(' ').length));
     };
 
@@ -779,12 +822,12 @@ test.describe('contact form', () => {
     };
 
     await submit();
-    await expect(page.getByRole('status')).toHaveText(/Message sent/);
+    await expect(page.locator('[data-form-status]')).toHaveText(/Message sent/);
     await expect(page).toHaveURL(/\/profile\/#contact$/);
 
     status = 503;
     await submit();
-    await expect(page.getByRole('status')).toHaveText(/could not be sent/);
+    await expect(page.locator('[data-form-status]')).toHaveText(/could not be sent/);
     await expect(page.getByRole('button', { name: 'Send message' })).toBeEnabled();
   });
 });
