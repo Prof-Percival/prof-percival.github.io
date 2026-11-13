@@ -473,14 +473,59 @@ test.describe('ShelfIQ project story', () => {
 });
 
 test.describe('journey route', () => {
-  test('keeps the career story focused and accurate', async ({ page }) => {
+  test.beforeEach(async ({ page }) => {
     await page.goto('/journey/');
+  });
+
+  test('keeps the career story focused and accurate', async ({ page }) => {
     await expect(page).toHaveTitle('Journey | Phadima Percival Maredi');
     await expect(page.getByRole('heading', { level: 1 })).toHaveText(/career connected/i);
-    await expect(page.getByText('Software Engineer: Back-End', { exact: true })).toBeVisible();
-    await expect(page.getByText('Software Development Engineer, EC2', { exact: true })).toBeVisible();
+    const chronology = page.locator('#experience');
+    await expect(chronology.getByText('Software Engineer: Back-End', { exact: true })).toBeVisible();
+    await expect(chronology.getByText('Software Development Engineer, EC2', { exact: true })).toBeVisible();
     await expect(page.getByText(/Software Development Engineer II|Level 2/)).toHaveCount(0);
+    await expect(page.getByRole('heading', { name: 'Every role, in document order.' })).toBeVisible();
     await expectAccessibleAndContained(page);
+  });
+
+  test('selects connected role chapters and thematic evidence', async ({ page }) => {
+    const map = page.locator('[data-journey-map]');
+    await expect(map.locator('[data-journey-node]')).toHaveCount(5);
+    await expect(map.getByRole('button', { name: /Capitec Bank/ })).toHaveAttribute('aria-pressed', 'true');
+
+    await map.getByRole('button', { name: /Amazon/ }).click();
+    await expect(map.getByRole('heading', { name: 'Amazon' })).toBeVisible();
+    await expect(map.getByText('Software Development Engineer, EC2', { exact: true })).toBeVisible();
+    await expect(map.getByRole('link', { name: /Cloud and delivery/ })).toHaveAttribute(
+      'href',
+      '/profile/#capabilities-title'
+    );
+    await expect(
+      page
+        .getByRole('navigation', { name: /Portfolio systems presented separately/ })
+        .getByRole('link', { name: /Agent Activity Risk Monitor/ })
+    ).toHaveAttribute('href', '/work/agent-risk-monitor/');
+    await expect(map.getByRole('status')).toHaveText(/Amazon selected/);
+  });
+
+  test('supports arrow-key movement across the route', async ({ page }) => {
+    const map = page.locator('[data-journey-map]');
+    const olx = map.getByRole('button', { name: /OLX/ });
+    await olx.focus();
+    await olx.press('ArrowRight');
+
+    await expect(map.getByRole('button', { name: /Amazon/ })).toBeFocused();
+    await expect(map.getByRole('button', { name: /Amazon/ })).toHaveAttribute('aria-pressed', 'true');
+  });
+
+  test('removes route animation when reduced motion is requested', async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await page.reload();
+    const animationName = await page
+      .locator('[data-journey-node]')
+      .first()
+      .evaluate((node) => getComputedStyle(node).animationName);
+    expect(animationName).toBe('none');
   });
 });
 

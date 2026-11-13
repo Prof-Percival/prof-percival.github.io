@@ -4,20 +4,22 @@ import SectionHeading from './SectionHeading.astro';
 
 interface Props {
   number?: string;
+  eyebrow?: string;
+  title?: string;
+  introduction?: string;
 }
 
-const { number = '03' } = Astro.props;
+const {
+  number = '03',
+  eyebrow = 'Experience',
+  title = 'Full-stack range. Back-end depth.',
+  introduction = 'I work across the product, then go deep where contracts, data, reliability, and operations carry the most weight.',
+} = Astro.props;
 ---
 
 <section class="section experience-section" id="experience" aria-labelledby="experience-title">
   <div class="shell">
-    <SectionHeading
-      number={number}
-      eyebrow="Experience"
-      id="experience-title"
-      title="Full-stack range. Back-end depth."
-      introduction="I work across the product, then go deep where contracts, data, reliability, and operations carry the most weight."
-    />
+    <SectionHeading number={number} eyebrow={eyebrow} id="experience-title" title={title} introduction={introduction} />
 
     <div class="timeline">
       {experience.map((item, index) => (
