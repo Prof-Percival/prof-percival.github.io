@@ -13,6 +13,38 @@ async function expectAccessibleAndContained(page: Page) {
   await expect(page.getByRole('heading', { level: 1 })).toHaveCount(1);
 }
 
+type LocalAiMockBehavior = 'ready' | 'loading' | 'error';
+
+async function mockLocalAiWorker(page: Page, behavior: LocalAiMockBehavior = 'ready') {
+  const state = { requests: 0 };
+  await page.route('**/*guide-ai.worker*.js', async (route) => {
+    state.requests += 1;
+    const workerSource = `
+      self.onmessage = (event) => {
+        const message = event.data;
+        if (message.type === 'initialize') {
+          self.postMessage({ type: 'progress', stage: 'download', progress: 25, loaded: 10, total: 40 });
+          if ('${behavior}' === 'ready') {
+            setTimeout(() => self.postMessage({ type: 'ready' }), 120);
+          } else if ('${behavior}' === 'error') {
+            setTimeout(() => self.postMessage({ type: 'error' }), 30);
+          }
+          return;
+        }
+        if (message.type === 'rank') {
+          self.postMessage({
+            type: 'result',
+            requestId: message.requestId,
+            answerIds: ['featured-system'],
+          });
+        }
+      };
+    `;
+    await route.fulfill({ status: 200, contentType: 'application/javascript', body: workerSource });
+  });
+  return state;
+}
+
 test.describe('interactive portfolio hub', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/');
@@ -61,6 +93,7 @@ test.describe('interactive portfolio hub', () => {
     const csp = page.locator('meta[http-equiv="Content-Security-Policy"]');
     await expect(csp).toHaveAttribute('content', /formspree\.io/);
     await expect(csp).toHaveAttribute('content', /goatcounter\.com/);
+    await expect(csp).not.toHaveAttribute('content', /wasm-unsafe-eval|huggingface\.co|worker-src/);
 
     const manifest = await page.request.get('/site.webmanifest');
     expect(manifest.ok()).toBe(true);
@@ -127,8 +160,13 @@ test.describe('verified portfolio guide', () => {
   test('matches suggested and typed questions to published answers', async ({ page }) => {
     await expect(page).toHaveTitle('Verified portfolio guide | Phadima Percival Maredi');
     await expect(page.getByRole('heading', { level: 1 })).toHaveText(/Ask a focused question/);
-    await expect(page.getByText('Verified mode', { exact: true })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Verified' })).toHaveAttribute('aria-pressed', 'true');
     await expect(page.getByText(/does not generate new claims/i)).toBeVisible();
+    const csp = page.locator('meta[http-equiv="Content-Security-Policy"]');
+    await expect(csp).toHaveAttribute('content', /'wasm-unsafe-eval'/);
+    await expect(csp).toHaveAttribute('content', /worker-src 'self'/);
+    await expect(csp).toHaveAttribute('content', /https:\/\/huggingface\.co/);
+    await expect(csp).toHaveAttribute('content', /https:\/\/us\.aws\.cdn\.hf\.co/);
 
     await page.getByRole('link', { name: 'What kind of engineer is Phadima?' }).click();
     await expect(page.getByRole('heading', { name: 'Full-stack range with back-end depth' })).toBeVisible();
@@ -146,6 +184,71 @@ test.describe('verified portfolio guide', () => {
       'href',
       '/journey/'
     );
+  });
+
+  test('does not load model assets before explicit enablement', async ({ page }) => {
+    const modelRequests: string[] = [];
+    page.on('request', (request) => {
+      if (/guide-ai\.worker|huggingface\.co|\.hf\.co|ort-wasm/.test(request.url())) modelRequests.push(request.url());
+    });
+
+    await page.reload();
+    await page.waitForTimeout(100);
+    expect(modelRequests).toEqual([]);
+
+    await page.getByRole('button', { name: 'Local AI', exact: true }).click();
+    await expect(page.getByRole('heading', { name: 'Semantic matching on this device.' })).toBeVisible();
+    await expect(page.getByText('About 39 MB')).toBeVisible();
+    expect(modelRequests).toEqual([]);
+    await expectAccessibleAndContained(page);
+  });
+
+  test('enables mocked local AI and ranks only curated answers', async ({ page }) => {
+    const worker = await mockLocalAiWorker(page);
+    await page.getByRole('button', { name: 'Local AI', exact: true }).click();
+    expect(worker.requests).toBe(0);
+
+    await page.getByRole('button', { name: 'Enable local AI' }).click();
+    await expect(page.getByText('25%', { exact: true })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Local AI' })).toHaveAttribute('aria-pressed', 'true');
+    expect(worker.requests).toBe(1);
+
+    await page.getByLabel('What would you like to know?').fill('Where should I begin?');
+    await page.getByRole('button', { name: 'Rank locally' }).click();
+    await expect(page.locator('[data-guide-answer]:visible').first()).toHaveAttribute(
+      'data-guide-answer',
+      'featured-system'
+    );
+    await expect(page.getByRole('heading', { name: 'Start with Missing Children SA' })).toBeVisible();
+    await expect(page.getByRole('status')).toHaveText(/Local AI ranked 1 curated answer/);
+    await expect(page.getByText(/connects an ASP.NET Core API/)).toBeVisible();
+    await expectAccessibleAndContained(page);
+  });
+
+  test('cancels model loading and keeps Verified mode active', async ({ page }) => {
+    await mockLocalAiWorker(page, 'loading');
+    await page.getByRole('button', { name: 'Local AI', exact: true }).click();
+    await page.getByRole('button', { name: 'Enable local AI' }).click();
+    await expect(page.getByRole('button', { name: 'Cancel model download' })).toBeVisible();
+
+    await page.getByRole('button', { name: 'Cancel model download' }).click();
+    await expect(page.getByRole('status')).toHaveText(/loading cancelled/);
+    await expect(page.getByRole('button', { name: 'Verified' })).toHaveAttribute('aria-pressed', 'true');
+  });
+
+  test('falls back after model failure and respects data saver', async ({ page }) => {
+    await mockLocalAiWorker(page, 'error');
+    await page.getByRole('button', { name: 'Local AI', exact: true }).click();
+    await page.getByRole('button', { name: 'Enable local AI' }).click();
+    await expect(page.getByRole('status')).toHaveText(/could not start.*Verified mode remains active/);
+    await expect(page.getByRole('button', { name: 'Try local AI again' })).toBeVisible();
+
+    await page.evaluate(() => {
+      Object.defineProperty(navigator, 'connection', { configurable: true, value: { saveData: true } });
+    });
+    await page.getByRole('button', { name: 'Local AI', exact: true }).click();
+    await expect(page.locator('[data-local-ai-unavailable]')).toHaveText(/data saver enabled/);
+    await expect(page.getByRole('button', { name: 'Enable local AI' })).toBeHidden();
   });
 
   test('shows no-result and reset states without inventing an answer', async ({ page }) => {
@@ -349,6 +452,8 @@ test.describe('supporting routes', () => {
     await expect(page.getByRole('heading', { level: 1 })).toHaveText(/Clear about what this site collects/);
     await expect(page.getByText('GoatCounter')).toBeVisible();
     await expect(page.getByText('Formspree')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Portfolio guide' })).toBeVisible();
+    await expect(page.getByText(/downloads a model and inference runtime from Hugging Face/)).toBeVisible();
     await expectAccessibleAndContained(page);
 
     const response = await page.goto('/this-page-does-not-exist');

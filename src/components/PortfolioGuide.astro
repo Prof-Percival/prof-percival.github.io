@@ -1,4 +1,5 @@
 ---
+import { localAiModel } from '../data/guide-ai';
 import { guideAnswers, suggestedGuideAnswerIds, type GuideAnswer } from '../data/guide';
 import ArrowIcon from './ArrowIcon.astro';
 
@@ -8,18 +9,89 @@ const suggestedAnswers = suggestedGuideAnswerIds
 ---
 
 <section class="section guide-section shell" aria-labelledby="guide-tool-title">
-  <div class="guide-layout" data-portfolio-guide>
+  <div class="guide-layout" data-portfolio-guide data-guide-mode="verified">
     <div class="guide-console">
       <header class="guide-console__header">
-        <p class="guide-mode">
-          <span aria-hidden="true"></span> Verified mode
-        </p>
+        <div class="guide-mode-switch" role="group" aria-label="Portfolio guide mode">
+          <button type="button" aria-pressed="true" data-guide-mode-button="verified">
+            <span class="guide-mode-switch__verified" aria-hidden="true"></span>
+            Verified
+          </button>
+          <button
+            type="button"
+            aria-pressed="false"
+            aria-controls="local-ai-options"
+            aria-expanded="false"
+            data-guide-mode-button="local"
+          >
+            <span class="guide-mode-switch__local" aria-hidden="true"></span>
+            Local AI
+          </button>
+        </div>
         <h2 id="guide-tool-title">Ask about the work.</h2>
-        <p id="guide-privacy">
-          This mode matches your question to published portfolio facts in your browser. It does not generate new claims
-          or send your question to an AI service.
+        <p id="guide-privacy" data-guide-explanation>
+          Verified mode matches your question to published portfolio facts in your browser. It does not generate new
+          claims or send your question to an AI service.
         </p>
       </header>
+
+      <section
+        class="guide-local-panel"
+        id="local-ai-options"
+        aria-labelledby="local-ai-title"
+        data-local-ai-panel
+        hidden
+      >
+        <div>
+          <p class="eyebrow">Optional local model</p>
+          <h3 id="local-ai-title">Semantic matching on this device.</h3>
+          <p>
+            The model only ranks the same {guideAnswers.length} curated answers. It cannot write, change, or add
+            portfolio claims.
+          </p>
+        </div>
+        <dl>
+          <div>
+            <dt>First use</dt>
+            <dd>About {localAiModel.approximateDownloadMb} MB</dd>
+          </div>
+          <div>
+            <dt>Privacy</dt>
+            <dd>Questions stay in this tab</dd>
+          </div>
+          <div>
+            <dt>Storage</dt>
+            <dd>Browser cache when available</dd>
+          </div>
+        </dl>
+        <p class="guide-local-panel__note">
+          The download includes the model and browser inference runtime. It starts only after you enable this mode.
+          <a href={localAiModel.detailsHref} target="_blank" rel="noopener noreferrer" data-track="local-ai-model">
+            Model details and {localAiModel.license} license <ArrowIcon />
+          </a>
+        </p>
+        <p class="guide-local-panel__unavailable" data-local-ai-unavailable hidden></p>
+        <div class="guide-local-panel__actions">
+          <button class="button button--primary" type="button" data-local-ai-enable>
+            <span data-local-ai-enable-label>Enable local AI</span> <ArrowIcon />
+          </button>
+          <button class="button guide-local-panel__secondary" type="button" data-local-ai-dismiss>
+            Stay with Verified
+          </button>
+          <button class="button guide-local-panel__secondary" type="button" data-local-ai-cancel hidden>
+            Cancel model download
+          </button>
+        </div>
+        <div class="guide-local-progress" data-local-ai-progress hidden>
+          <div>
+            <span id="local-ai-progress-label" data-local-ai-stage>
+              Preparing local model
+            </span>
+            <span data-local-ai-percent>0%</span>
+          </div>
+          <progress max="100" value="0" aria-labelledby="local-ai-progress-label" data-local-ai-progress-bar></progress>
+        </div>
+      </section>
 
       <form class="guide-form" action="/guide/#verified-answers" method="get" data-guide-form>
         <label for="guide-query">What would you like to know?</label>
@@ -33,8 +105,8 @@ const suggestedAnswers = suggestedGuideAnswerIds
             placeholder="Ask about projects, experience, or skills"
             data-guide-query
           />
-          <button class="button button--primary" type="submit">
-            Find an answer <ArrowIcon />
+          <button class="button button--primary" type="submit" data-guide-submit>
+            <span data-guide-submit-label>Find an answer</span> <ArrowIcon />
           </button>
         </div>
         <div class="guide-form__footer">
@@ -75,7 +147,7 @@ const suggestedAnswers = suggestedGuideAnswerIds
       </div>
 
       <div class="guide-no-results" data-guide-no-results hidden>
-        <p class="eyebrow">No verified match</p>
+        <p class="eyebrow">No curated match</p>
         <h2>Try a different question.</h2>
         <p>
           Ask about projects, experience, back-end skills, cloud work, data, education, languages, or contact options.
@@ -84,7 +156,7 @@ const suggestedAnswers = suggestedGuideAnswerIds
 
       <section class="guide-library" id="verified-answers" aria-labelledby="verified-answers-title" data-guide-library>
         <header class="guide-library__header">
-          <p class="eyebrow">Verified answer library</p>
+          <p class="eyebrow">Curated answer library</p>
           <h2 id="verified-answers-title">Published facts, linked to their source.</h2>
         </header>
         <div class="guide-answer-list" data-guide-answer-list>
@@ -115,29 +187,91 @@ const suggestedAnswers = suggestedGuideAnswerIds
 </section>
 
 <script>
-  import { findGuideAnswers } from '../data/guide';
+  import LocalAiWorker from '../workers/guide-ai.worker.ts?worker';
+  import { createGuideAiDocuments, type GuideAiResponse } from '../data/guide-ai';
+  import { findGuideAnswers, guideAnswers } from '../data/guide';
+
+  type GuideMode = 'verified' | 'local';
+  type DataAwareNavigator = Navigator & { connection?: { saveData?: boolean } };
 
   const guides = document.querySelectorAll<HTMLElement>('[data-portfolio-guide]');
 
   guides.forEach((guide) => {
     const form = guide.querySelector<HTMLFormElement>('[data-guide-form]');
     const input = guide.querySelector<HTMLInputElement>('[data-guide-query]');
+    const submit = guide.querySelector<HTMLButtonElement>('[data-guide-submit]');
+    const submitLabel = guide.querySelector<HTMLElement>('[data-guide-submit-label]');
     const status = guide.querySelector<HTMLElement>('[data-guide-status]');
+    const explanation = guide.querySelector<HTMLElement>('[data-guide-explanation]');
     const empty = guide.querySelector<HTMLElement>('[data-guide-empty]');
     const noResults = guide.querySelector<HTMLElement>('[data-guide-no-results]');
     const library = guide.querySelector<HTMLElement>('[data-guide-library]');
     const answerList = guide.querySelector<HTMLElement>('[data-guide-answer-list]');
     const answerCards = Array.from(guide.querySelectorAll<HTMLElement>('[data-guide-answer]'));
     const promptLinks = guide.querySelectorAll<HTMLAnchorElement>('[data-guide-prompt]');
+    const verifiedModeButton = guide.querySelector<HTMLButtonElement>('[data-guide-mode-button="verified"]');
+    const localModeButton = guide.querySelector<HTMLButtonElement>('[data-guide-mode-button="local"]');
+    const localPanel = guide.querySelector<HTMLElement>('[data-local-ai-panel]');
+    const enableButton = guide.querySelector<HTMLButtonElement>('[data-local-ai-enable]');
+    const enableLabel = guide.querySelector<HTMLElement>('[data-local-ai-enable-label]');
+    const dismissButton = guide.querySelector<HTMLButtonElement>('[data-local-ai-dismiss]');
+    const cancelButton = guide.querySelector<HTMLButtonElement>('[data-local-ai-cancel]');
+    const unavailable = guide.querySelector<HTMLElement>('[data-local-ai-unavailable]');
+    const progressWrapper = guide.querySelector<HTMLElement>('[data-local-ai-progress]');
+    const progressBar = guide.querySelector<HTMLProgressElement>('[data-local-ai-progress-bar]');
+    const progressStage = guide.querySelector<HTMLElement>('[data-local-ai-stage]');
+    const progressPercent = guide.querySelector<HTMLElement>('[data-local-ai-percent]');
 
-    if (!form || !input || !status || !empty || !noResults || !library || !answerList) return;
+    if (
+      !form ||
+      !input ||
+      !submit ||
+      !submitLabel ||
+      !status ||
+      !explanation ||
+      !empty ||
+      !noResults ||
+      !library ||
+      !answerList ||
+      !verifiedModeButton ||
+      !localModeButton ||
+      !localPanel ||
+      !enableButton ||
+      !enableLabel ||
+      !dismissButton ||
+      !cancelButton ||
+      !unavailable ||
+      !progressWrapper ||
+      !progressBar ||
+      !progressStage ||
+      !progressPercent
+    )
+      return;
 
     const answerCardsById = new Map<string, HTMLElement>();
     answerCards.forEach((card) => {
       if (card.dataset.guideAnswer) answerCardsById.set(card.dataset.guideAnswer, card);
     });
 
-    const resetGuide = () => {
+    let activeMode: GuideMode = 'verified';
+    let aiWorker: Worker | undefined;
+    let aiReady = false;
+    let pendingRequestId = 0;
+    let pendingQuestion = '';
+
+    const setMode = (mode: GuideMode) => {
+      activeMode = mode;
+      guide.dataset.guideMode = mode;
+      verifiedModeButton.setAttribute('aria-pressed', String(mode === 'verified'));
+      localModeButton.setAttribute('aria-pressed', String(mode === 'local'));
+      submitLabel.textContent = mode === 'local' ? 'Rank locally' : 'Find an answer';
+      explanation.textContent =
+        mode === 'local'
+          ? 'Local AI interprets your question on this device, then ranks the same curated answers. It cannot generate or change portfolio claims.'
+          : 'Verified mode matches your question to published portfolio facts in your browser. It does not generate new claims or send your question to an AI service.';
+    };
+
+    const resetGuide = (message?: string) => {
       answerCards.forEach((card) => {
         card.hidden = true;
         answerList.append(card);
@@ -146,66 +280,265 @@ const suggestedAnswers = suggestedGuideAnswerIds
       noResults.hidden = true;
       empty.hidden = false;
       status.dataset.state = 'empty';
-      status.textContent = 'Verified guide ready. Choose a suggested question or type your own.';
+      status.textContent =
+        message ??
+        (activeMode === 'local'
+          ? 'Local AI ready. Choose a suggested question or type your own.'
+          : 'Verified guide ready. Choose a suggested question or type your own.');
     };
 
-    const showAnswers = (question: string) => {
-      const normalizedQuestion = question.trim();
-      if (!normalizedQuestion) {
-        resetGuide();
-        return;
-      }
-
-      const results = findGuideAnswers(normalizedQuestion);
-      const resultIds = new Set<string>(results.map((answer) => answer.id));
-      results.forEach((answer) => {
-        const card = answerCardsById.get(answer.id);
-        if (card) answerList.append(card);
-      });
+    const renderAnswerIds = (answerIds: readonly string[], question: string, mode: GuideMode) => {
+      const uniqueIds = [...new Set(answerIds)].filter((id) => answerCardsById.has(id));
+      const resultIds = new Set(uniqueIds);
+      uniqueIds.forEach((id) => answerList.append(answerCardsById.get(id)!));
       answerCards.forEach((card) => {
         card.hidden = !resultIds.has(card.dataset.guideAnswer ?? '');
         if (card.hidden) answerList.append(card);
       });
       empty.hidden = true;
 
-      if (results.length === 0) {
+      if (uniqueIds.length === 0) {
         library.hidden = true;
         noResults.hidden = false;
         status.dataset.state = 'no-results';
-        status.textContent = `No verified answer matched ${normalizedQuestion}.`;
+        status.textContent =
+          mode === 'local'
+            ? `Local AI found no strong curated match for ${question}.`
+            : `No verified answer matched ${question}.`;
         return;
       }
 
       noResults.hidden = true;
       library.hidden = false;
       status.dataset.state = 'results';
-      status.textContent = `Showing ${results.length} verified ${results.length === 1 ? 'answer' : 'answers'} for ${normalizedQuestion}.`;
+      status.textContent =
+        mode === 'local'
+          ? `Local AI ranked ${uniqueIds.length} curated ${uniqueIds.length === 1 ? 'answer' : 'answers'} for ${question}.`
+          : `Showing ${uniqueIds.length} verified ${uniqueIds.length === 1 ? 'answer' : 'answers'} for ${question}.`;
+    };
+
+    const showVerifiedAnswers = (question: string) => {
+      const normalizedQuestion = question.trim();
+      if (!normalizedQuestion) {
+        resetGuide();
+        return;
+      }
+      renderAnswerIds(
+        findGuideAnswers(normalizedQuestion).map((answer) => answer.id),
+        normalizedQuestion,
+        'verified'
+      );
+    };
+
+    const releaseWorker = () => {
+      aiWorker?.terminate();
+      aiWorker = undefined;
+      aiReady = false;
+      submit.disabled = false;
+    };
+
+    const resetLocalControls = () => {
+      progressWrapper.hidden = true;
+      cancelButton.hidden = true;
+      dismissButton.hidden = false;
+      enableButton.hidden = false;
+      enableButton.disabled = false;
+      enableLabel.textContent = 'Enable local AI';
+      progressBar.value = 0;
+      progressStage.textContent = 'Preparing local model';
+      progressPercent.textContent = '0%';
+      unavailable.hidden = true;
+      unavailable.textContent = '';
+    };
+
+    const unavailableReason = (): string | null => {
+      if ((navigator as DataAwareNavigator).connection?.saveData) {
+        return 'Local AI stays off because your browser has data saver enabled.';
+      }
+      if (!('Worker' in window) || !('WebAssembly' in window)) {
+        return 'Local AI is not supported by this browser. Verified mode remains available.';
+      }
+      return null;
+    };
+
+    const fallBackToVerified = (message: string) => {
+      releaseWorker();
+      setMode('verified');
+      resetLocalControls();
+      localPanel.hidden = false;
+      localModeButton.setAttribute('aria-expanded', 'true');
+      enableLabel.textContent = 'Try local AI again';
+      unavailable.hidden = false;
+      unavailable.textContent = message;
+      if (input.value.trim()) showVerifiedAnswers(input.value);
+      else resetGuide();
+      status.dataset.state = 'fallback';
+      status.textContent = `${message} Verified mode remains active.`;
+    };
+
+    const rankLocally = (question: string) => {
+      const normalizedQuestion = question.trim();
+      if (!normalizedQuestion) {
+        resetGuide();
+        return;
+      }
+      if (!aiWorker || !aiReady) {
+        fallBackToVerified('Local AI is not ready.');
+        return;
+      }
+      pendingRequestId += 1;
+      pendingQuestion = normalizedQuestion;
+      submit.disabled = true;
+      status.dataset.state = 'loading';
+      status.textContent = 'Local AI is ranking the curated answers on this device.';
+      aiWorker.postMessage({
+        type: 'rank',
+        requestId: pendingRequestId,
+        query: normalizedQuestion,
+        limit: 3,
+      });
+    };
+
+    const handleWorkerMessage = (event: MessageEvent<GuideAiResponse>) => {
+      const message = event.data;
+      if (message.type === 'progress') {
+        const value = Number.isFinite(message.progress) ? Math.min(100, Math.max(0, message.progress)) : 0;
+        progressBar.value = value;
+        progressPercent.textContent = `${Math.round(value)}%`;
+        progressStage.textContent =
+          message.stage === 'indexing' ? 'Indexing curated answers' : 'Downloading local model';
+        status.dataset.state = 'loading';
+        status.textContent = `${progressStage.textContent}. ${Math.round(value)}%.`;
+        return;
+      }
+      if (message.type === 'ready') {
+        aiReady = true;
+        submit.disabled = false;
+        setMode('local');
+        resetLocalControls();
+        localPanel.hidden = true;
+        localModeButton.setAttribute('aria-expanded', 'false');
+        document.dispatchEvent(new CustomEvent('portfolio:track', { detail: { path: 'local-ai-ready' } }));
+        if (input.value.trim()) rankLocally(input.value);
+        else resetGuide();
+        return;
+      }
+      if (message.type === 'result') {
+        if (message.requestId !== pendingRequestId) return;
+        submit.disabled = false;
+        renderAnswerIds(message.answerIds, pendingQuestion, 'local');
+        return;
+      }
+      fallBackToVerified('Local AI could not start.');
+    };
+
+    const showLocalOptions = () => {
+      resetLocalControls();
+      localPanel.hidden = false;
+      localModeButton.setAttribute('aria-expanded', 'true');
+      const reason = unavailableReason();
+      if (reason) {
+        enableButton.hidden = true;
+        unavailable.hidden = false;
+        unavailable.textContent = reason;
+        status.dataset.state = 'fallback';
+        status.textContent = reason;
+      } else {
+        status.dataset.state = 'empty';
+        status.textContent =
+          'Review the local download and privacy details, then enable it if you want semantic matching.';
+      }
+    };
+
+    const startLocalAi = () => {
+      const reason = unavailableReason();
+      if (reason) {
+        showLocalOptions();
+        return;
+      }
+      releaseWorker();
+      aiWorker = new LocalAiWorker();
+      aiWorker.addEventListener('message', handleWorkerMessage);
+      aiWorker.addEventListener('error', () => fallBackToVerified('Local AI could not start.'));
+      enableButton.hidden = true;
+      dismissButton.hidden = true;
+      cancelButton.hidden = false;
+      progressWrapper.hidden = false;
+      status.dataset.state = 'loading';
+      status.textContent = 'Preparing the local model download.';
+      aiWorker.postMessage({ type: 'initialize', documents: createGuideAiDocuments(guideAnswers) });
     };
 
     form.addEventListener('submit', (event) => {
       event.preventDefault();
-      showAnswers(input.value);
+      if (activeMode === 'local') rankLocally(input.value);
+      else showVerifiedAnswers(input.value);
     });
 
     form.addEventListener('reset', () => {
-      window.setTimeout(resetGuide, 0);
+      window.setTimeout(() => resetGuide(), 0);
     });
 
     promptLinks.forEach((link) => {
       link.addEventListener('click', (event) => {
         event.preventDefault();
         input.value = link.dataset.guidePrompt ?? '';
-        showAnswers(input.value);
+        if (activeMode === 'local') rankLocally(input.value);
+        else showVerifiedAnswers(input.value);
       });
     });
 
+    verifiedModeButton.addEventListener('click', () => {
+      const wasLoading = Boolean(aiWorker && !aiReady);
+      releaseWorker();
+      setMode('verified');
+      resetLocalControls();
+      localPanel.hidden = true;
+      localModeButton.setAttribute('aria-expanded', 'false');
+      if (input.value.trim()) showVerifiedAnswers(input.value);
+      else resetGuide();
+      if (wasLoading) {
+        status.dataset.state = 'fallback';
+        status.textContent = 'Local model loading stopped. Verified mode remains active.';
+      }
+    });
+
+    localModeButton.addEventListener('click', () => {
+      if (aiReady) {
+        setMode('local');
+        return;
+      }
+      showLocalOptions();
+    });
+
+    enableButton.addEventListener('click', startLocalAi);
+    dismissButton.addEventListener('click', () => {
+      localPanel.hidden = true;
+      localModeButton.setAttribute('aria-expanded', 'false');
+      resetGuide('Verified guide ready. Local AI remains off.');
+    });
+    cancelButton.addEventListener('click', () => {
+      releaseWorker();
+      setMode('verified');
+      resetLocalControls();
+      localPanel.hidden = true;
+      localModeButton.setAttribute('aria-expanded', 'false');
+      if (input.value.trim()) showVerifiedAnswers(input.value);
+      else resetGuide();
+      status.dataset.state = 'fallback';
+      status.textContent = 'Local model loading cancelled. Verified mode remains active.';
+    });
+
     guide.dataset.enhanced = 'true';
+    setMode('verified');
     const initialQuestion = new URL(window.location.href).searchParams.get('question')?.trim();
     if (initialQuestion) {
       input.value = initialQuestion.slice(0, 160);
-      showAnswers(input.value);
+      showVerifiedAnswers(input.value);
     } else {
       resetGuide();
     }
+
+    window.addEventListener('pagehide', releaseWorker, { once: true });
   });
 </script>
