@@ -11,6 +11,7 @@ describe('portfolio navigation', () => {
 
   it('uses root-relative canonical route destinations', () => {
     expect(portfolioRoutes[0]).toMatchObject({ id: 'home', href: '/' });
+    expect(portfolioRoutes.at(-1)).toMatchObject({ id: 'guide', number: '04', href: '/guide/' });
     expect(portfolioRoutes.every((route) => route.href.startsWith('/'))).toBe(true);
     expect(portfolioRoutes.every((route) => !route.href.includes('#'))).toBe(true);
   });

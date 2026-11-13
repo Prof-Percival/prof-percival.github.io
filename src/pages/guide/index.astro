@@ -1,0 +1,29 @@
+---
+import AppShell from '../../components/AppShell.astro';
+import PortfolioGuide from '../../components/PortfolioGuide.astro';
+import RouteHero from '../../components/RouteHero.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="Verified portfolio guide | Phadima Percival Maredi"
+  description="Ask focused questions about the published projects, experience, capabilities, education, and contact options of software engineer Phadima Percival Maredi."
+>
+  <AppShell active="guide">
+    <main id="main" class="route-page guide-route">
+      <RouteHero
+        number="04"
+        eyebrow="Portfolio guide"
+        title="Ask a focused question. Follow the source."
+        introduction="Verified mode searches a curated set of published portfolio answers. It stays useful without a model, keeps every claim inspectable, and always links you to the full context."
+      >
+        <div class="route-hero__facts" aria-label="Portfolio guide summary">
+          <span>Curated answers</span>
+          <span>Browser-only matching</span>
+          <span>Source links included</span>
+        </div>
+      </RouteHero>
+      <PortfolioGuide />
+    </main>
+  </AppShell>
+</BaseLayout>

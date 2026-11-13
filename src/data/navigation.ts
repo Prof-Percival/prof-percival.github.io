@@ -1,4 +1,4 @@
-export type PortfolioRouteId = 'home' | 'work' | 'journey' | 'profile';
+export type PortfolioRouteId = 'home' | 'work' | 'journey' | 'profile' | 'guide';
 
 export type PortfolioRoute = {
   id: PortfolioRouteId;
@@ -36,5 +36,12 @@ export const portfolioRoutes: readonly PortfolioRoute[] = [
     label: 'Profile',
     href: '/profile/',
     description: 'Read capabilities, education, credentials, and contact details.',
+  },
+  {
+    id: 'guide',
+    number: '04',
+    label: 'Guide',
+    href: '/guide/',
+    description: 'Ask focused questions and follow each answer to its source.',
   },
 ] as const;
