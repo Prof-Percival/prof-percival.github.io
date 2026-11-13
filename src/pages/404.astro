@@ -1,7 +1,6 @@
 ---
+import AppShell from '../components/AppShell.astro';
 import ArrowIcon from '../components/ArrowIcon.astro';
-import Footer from '../components/Footer.astro';
-import Header from '../components/Header.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
 ---
 
@@ -10,17 +9,17 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   description="The requested portfolio page could not be found."
   noindex
 >
-  <Header />
-  <main id="main" class="not-found shell">
-    <div class="not-found__code" aria-hidden="true">
-      404
-    </div>
-    <p class="eyebrow">Page not found</p>
-    <h1>This path ends here. The work continues elsewhere.</h1>
-    <p>The page may have moved, or the address may be incomplete.</p>
-    <a class="button button--primary" href="/">
-      Return to the portfolio <ArrowIcon direction="left" />
-    </a>
-  </main>
-  <Footer />
+  <AppShell>
+    <main id="main" class="not-found shell">
+      <div class="not-found__code" aria-hidden="true">
+        404
+      </div>
+      <p class="eyebrow">Page not found</p>
+      <h1>This path ends here. The work continues elsewhere.</h1>
+      <p>The page may have moved, or the address may be incomplete.</p>
+      <a class="button button--primary" href="/">
+        Return to the portfolio <ArrowIcon direction="left" />
+      </a>
+    </main>
+  </AppShell>
 </BaseLayout>

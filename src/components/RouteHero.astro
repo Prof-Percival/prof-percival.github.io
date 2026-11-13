@@ -1,0 +1,23 @@
+---
+interface Props {
+  number: string;
+  eyebrow: string;
+  title: string;
+  introduction: string;
+}
+
+const { number, eyebrow, title, introduction } = Astro.props;
+---
+
+<header class="route-hero shell">
+  <div>
+    <p class="eyebrow">
+      {number} / {eyebrow}
+    </p>
+    <h1>{title}</h1>
+  </div>
+  <div class="route-hero__context">
+    <p>{introduction}</p>
+    <slot />
+  </div>
+</header>

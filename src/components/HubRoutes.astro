@@ -1,0 +1,74 @@
+---
+import ArrowIcon from './ArrowIcon.astro';
+---
+
+<section class="hub-routes shell" id="routes" aria-labelledby="routes-title">
+  <div class="hub-routes__heading">
+    <p class="eyebrow">Choose a route</p>
+    <h2 id="routes-title">Start where your question starts.</h2>
+    <p>Take the short path, or follow the whole system at your own pace.</p>
+  </div>
+
+  <div class="hub-route-grid">
+    <a class="hub-card hub-card--work" id="work" href="/work/">
+      <span class="hub-card__number">01 / Work</span>
+      <div>
+        <h3>See systems, not a screenshot wall.</h3>
+        <p>Three flagship case studies, interactive labs, and the broader project atlas.</p>
+      </div>
+      <div class="hub-card__systems" aria-hidden="true">
+        <span>Missing Children SA</span>
+        <span>Fraud Rule Engine</span>
+        <span>Agent Risk Monitor</span>
+      </div>
+      <strong class="hub-card__action">
+        Explore work <ArrowIcon />
+      </strong>
+    </a>
+
+    <a class="hub-card hub-card--journey" id="experience" href="/journey/">
+      <span class="hub-card__number">02 / Journey</span>
+      <div>
+        <h3>Trace the work behind the roles.</h3>
+        <p>Move through the career as a connected route rather than a list of dates.</p>
+      </div>
+      <div class="hub-card__timeline" aria-hidden="true">
+        <i></i>
+        <span>2020</span>
+        <i></i>
+        <span>2023</span>
+        <i></i>
+        <span>2025</span>
+        <i></i>
+        <span>Now</span>
+      </div>
+      <strong class="hub-card__action">
+        Follow the journey <ArrowIcon />
+      </strong>
+    </a>
+
+    <a class="hub-card hub-card--profile" id="about" href="/profile/">
+      <span class="hub-card__number">03 / Profile</span>
+      <div>
+        <h3>See the range behind the depth.</h3>
+        <p>Capabilities, education, selected credentials, languages, community work, and CV.</p>
+      </div>
+      <ul class="hub-card__capabilities" aria-hidden="true">
+        <li>Full-stack products</li>
+        <li>Back-end systems</li>
+        <li>Cloud delivery</li>
+        <li>Data and performance</li>
+      </ul>
+      <strong class="hub-card__action">
+        View profile <ArrowIcon />
+      </strong>
+    </a>
+
+    <a class="hub-card hub-card--contact" id="contact" href="/profile/#contact">
+      <span>Have a role, project, or difficult software problem?</span>
+      <strong>
+        Start a conversation <ArrowIcon />
+      </strong>
+    </a>
+  </div>
+</section>

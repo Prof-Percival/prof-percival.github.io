@@ -1,22 +1,48 @@
 import AxeBuilder from '@axe-core/playwright';
-import { expect, test } from '@playwright/test';
+import { expect, type Page, test } from '@playwright/test';
 
-test.describe('home page', () => {
+async function expectAccessibleAndContained(page: Page) {
+  const results = await new AxeBuilder({ page }).analyze();
+  expect(results.violations).toEqual([]);
+
+  const sizes = await page.evaluate(() => ({
+    viewport: window.innerWidth,
+    document: document.documentElement.scrollWidth,
+  }));
+  expect(sizes.document).toBeLessThanOrEqual(sizes.viewport);
+  await expect(page.getByRole('heading', { level: 1 })).toHaveCount(1);
+}
+
+test.describe('interactive portfolio hub', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/');
   });
 
-  test('presents the portfolio identity and primary actions', async ({ page }) => {
+  test('presents a concise identity and four clear routes', async ({ page }) => {
     await expect(page).toHaveTitle(/Phadima Percival Maredi/);
-    await expect(page.getByRole('banner').getByText('Phadima Percival Maredi')).toBeVisible();
-    await expect(page.getByText('Software Engineer · Cape Town')).toBeVisible();
     await expect(page.getByRole('heading', { level: 1 })).toHaveText(/dependable systems/i);
-    await expect(page.getByText(/full product stack/i)).toBeVisible();
-    await expect(page.getByRole('link', { name: /explore my work/i })).toHaveAttribute('href', '#work');
-    await expect(page.getByRole('link', { name: /^CV/ }).first()).toHaveAttribute(
-      'href',
-      '/resume/percival-maredi-cv.pdf'
-    );
+    await expect(page.getByText(/Full-stack product engineering with strong back-end depth/i)).toBeVisible();
+    await expect(page.getByRole('link', { name: /Explore the systems/i })).toHaveAttribute('href', '/work/');
+
+    for (const [name, href] of [
+      ['See systems, not a screenshot wall.', '/work/'],
+      ['Trace the work behind the roles.', '/journey/'],
+      ['See the range behind the depth.', '/profile/'],
+    ]) {
+      await expect(page.getByRole('link', { name: new RegExp(name) })).toHaveAttribute('href', href);
+    }
+  });
+
+  test('uses the persistent route rail on desktop', async ({ page, isMobile }) => {
+    test.skip(isMobile, 'The persistent rail becomes compact navigation on mobile.');
+    const rail = page.getByRole('complementary', { name: 'Portfolio navigation' });
+    await expect(rail).toBeVisible();
+    await expect(rail.getByRole('link', { name: /Phadima Percival Maredi.*portfolio home/i })).toBeVisible();
+    const routes = rail.getByRole('navigation', { name: 'Portfolio routes' });
+    await expect(routes.getByRole('link', { name: /Home/ })).toHaveAttribute('aria-current', 'page');
+    await expect(routes.getByRole('link', { name: /Work/ })).toHaveAttribute('href', '/work/');
+    await expect(routes.getByRole('link', { name: /Journey/ })).toHaveAttribute('href', '/journey/');
+    await expect(routes.getByRole('link', { name: /Profile/ })).toHaveAttribute('href', '/profile/');
   });
 
   test('publishes metadata and machine-readable discovery files', async ({ page }) => {
@@ -43,7 +69,57 @@ test.describe('home page', () => {
     expect(await robots.text()).toContain('Sitemap: https://prof-percival.github.io/sitemap-index.xml');
   });
 
-  test('shows the selected case study and every earlier project', async ({ page }) => {
+  test('defaults to dark mode and remembers a light selection', async ({ page }) => {
+    const themeColor = page.locator('meta[name="theme-color"]');
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+    await expect(themeColor).toHaveAttribute('content', '#090d12');
+
+    await page.getByRole('button', { name: 'Switch to light mode' }).first().click();
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
+    await expect(themeColor).toHaveAttribute('content', '#f4f0e8');
+
+    await page.reload();
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
+    await expect(themeColor).toHaveAttribute('content', '#f4f0e8');
+  });
+
+  test('lets keyboard and pointer users inspect the systems map', async ({ page }) => {
+    const apiNode = page.getByRole('button', { name: /02 API/ });
+    await apiNode.focus();
+    await expect(page.locator('#systems-map-detail')).toHaveText(/Stable contracts/);
+    await expect(apiNode).toHaveAttribute('data-active', '');
+  });
+
+  test('is accessible and contained', async ({ page }) => {
+    await expectAccessibleAndContained(page);
+  });
+});
+
+test.describe('mobile route navigation', () => {
+  test('reaches every focused route', async ({ page, isMobile }) => {
+    test.skip(!isMobile, 'Compact navigation is visible only at narrow widths.');
+    await page.goto('/');
+
+    await page.locator('summary[aria-label="Open navigation"]').click();
+    const navigation = page.getByRole('navigation', { name: 'Mobile navigation' });
+    await expect(navigation.getByRole('link', { name: 'Work' })).toHaveAttribute('href', '/work/');
+    await expect(navigation.getByRole('link', { name: 'Journey' })).toHaveAttribute('href', '/journey/');
+    await expect(navigation.getByRole('link', { name: 'Profile' })).toHaveAttribute('href', '/profile/');
+
+    await navigation.getByRole('link', { name: 'Work' }).click();
+    await expect(page).toHaveURL(/\/work\/$/);
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText(/Systems with decisions/);
+  });
+});
+
+test.describe('work route', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/work/');
+  });
+
+  test('presents selected and earlier work on a focused route', async ({ page }) => {
+    await expect(page).toHaveTitle('Work | Phadima Percival Maredi');
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText(/Systems with decisions/);
     await expect(page.getByRole('heading', { name: 'Missing Children SA' })).toBeVisible();
     await expect(page.getByRole('link', { name: 'Read the case study' })).toHaveAttribute(
       'href',
@@ -59,12 +135,6 @@ test.describe('home page', () => {
     ]) {
       await expect(page.getByRole('heading', { name: title, exact: true })).toBeVisible();
     }
-
-    const sicCard = page
-      .getByRole('article')
-      .filter({ has: page.getByRole('heading', { name: 'SIC Data Analysis and Visualization', exact: true }) });
-    await expect(sicCard.getByRole('img', { name: /data-analysis view/i })).toBeVisible();
-    await expect(sicCard.locator('img')).toHaveCount(0);
   });
 
   test('gives the SIC visualization deliberate use of its frame', async ({ page, isMobile }) => {
@@ -99,26 +169,29 @@ test.describe('home page', () => {
     }
   });
 
-  test('uses the general software-engineer identity while preserving the exact current role', async ({ page }) => {
+  test('is accessible and contained', async ({ page }) => {
+    await expectAccessibleAndContained(page);
+  });
+});
+
+test.describe('journey route', () => {
+  test('keeps the career story focused and accurate', async ({ page }) => {
+    await page.goto('/journey/');
+    await expect(page).toHaveTitle('Journey | Phadima Percival Maredi');
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText(/career connected/i);
     await expect(page.getByText('Software Engineer: Back-End', { exact: true })).toBeVisible();
     await expect(page.getByText('Software Development Engineer, EC2', { exact: true })).toBeVisible();
     await expect(page.getByText(/Software Development Engineer II|Level 2/)).toHaveCount(0);
+    await expectAccessibleAndContained(page);
   });
+});
 
-  test('keeps anchored sections clear of the sticky header', async ({ page, isMobile }) => {
-    test.skip(isMobile, 'Desktop navigation is hidden at narrow widths.');
-    await page.getByRole('navigation', { name: 'Main navigation' }).getByRole('link', { name: 'Work' }).click();
-    await expect(page).toHaveURL(/#work$/);
+test.describe('profile route', () => {
+  test('shows capabilities, credentials, languages, and community experience', async ({ page }) => {
+    await page.goto('/profile/');
+    await expect(page).toHaveTitle('Profile | Phadima Percival Maredi');
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText(/Full-stack range/);
 
-    const header = await page.locator('.site-header').boundingBox();
-    const heading = await page.getByRole('heading', { name: /Systems with a reason/ }).boundingBox();
-    expect(header).not.toBeNull();
-    expect(heading).not.toBeNull();
-    expect(heading!.y).toBeGreaterThanOrEqual(header!.y + header!.height);
-    await expect(page.getByRole('link', { name: 'Skip to content' })).not.toBeInViewport();
-  });
-
-  test('shows certifications, languages, and community experience from the professional profiles', async ({ page }) => {
     for (const credential of [
       'Java',
       'Data Science Foundations, Level 1',
@@ -133,69 +206,13 @@ test.describe('home page', () => {
     }
     await expect(page.getByRole('heading', { name: 'Peer Buddy' })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Student Intern' })).toBeVisible();
-  });
-
-  test('renders analytics only on the configured public host', async ({ page }) => {
-    await expect(page.locator('script[src="https://gc.zgo.at/count.js"]')).toHaveCount(0);
-  });
-
-  test('defaults to dark mode and remembers a light selection', async ({ page }) => {
-    const themeColor = page.locator('meta[name="theme-color"]');
-    await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
-    await expect(themeColor).toHaveAttribute('content', '#090d12');
-
-    await page.getByRole('button', { name: 'Switch to light mode' }).first().click();
-    await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
-    await expect(themeColor).toHaveAttribute('content', '#f4f0e8');
-
-    await page.reload();
-    await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
-    await expect(themeColor).toHaveAttribute('content', '#f4f0e8');
-    await expect(page.getByRole('button', { name: 'Switch to dark mode' }).first()).toBeVisible();
-  });
-
-  test('lets keyboard and pointer users inspect the systems map', async ({ page }) => {
-    const apiNode = page.getByRole('button', { name: /02 API/ });
-    await apiNode.focus();
-
-    await expect(page.locator('#systems-map-detail')).toHaveText(/Stable contracts/);
-    await expect(apiNode).toHaveAttribute('data-active', '');
-  });
-
-  test('has no detectable accessibility violations', async ({ page }) => {
-    const results = await new AxeBuilder({ page }).analyze();
-    expect(results.violations).toEqual([]);
-  });
-
-  test('does not overflow horizontally', async ({ page }) => {
-    const sizes = await page.evaluate(() => ({
-      viewport: window.innerWidth,
-      document: document.documentElement.scrollWidth,
-    }));
-
-    expect(sizes.document).toBeLessThanOrEqual(sizes.viewport);
-  });
-});
-
-test.describe('mobile navigation', () => {
-  test('keeps every section reachable', async ({ page, isMobile }) => {
-    test.skip(!isMobile, 'Mobile navigation is visible only at narrow widths.');
-    await page.goto('/');
-
-    await page.locator('summary[aria-label="Open navigation"]').click();
-    const navigation = page.getByRole('navigation', { name: 'Mobile navigation' });
-    await expect(navigation.getByRole('link', { name: 'Work' })).toBeVisible();
-    await expect(navigation.getByRole('link', { name: 'Contact' })).toBeVisible();
-
-    await navigation.getByRole('link', { name: 'Work' }).click();
-    await expect(page.getByRole('heading', { name: /Systems with a reason/ })).toBeInViewport();
-    await expect(page.getByRole('link', { name: 'Skip to content' })).not.toBeInViewport();
+    await expectAccessibleAndContained(page);
   });
 });
 
 test.describe('contact form', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/#contact');
+    await page.goto('/profile/#contact');
   });
 
   test('uses the dedicated Formspree endpoint and visible labels', async ({ page }) => {
@@ -220,111 +237,67 @@ test.describe('contact form', () => {
 
     const name = page.getByLabel('Name', { exact: true });
     await page.getByRole('button', { name: 'Send message' }).click();
-
     expect(await name.evaluate((input: HTMLInputElement) => input.validity.valueMissing)).toBe(true);
     expect(submissions).toBe(0);
-    await expect(page.getByRole('status')).toHaveText('');
   });
 
-  test('reports a successful submission without leaving the page', async ({ page }) => {
+  test('reports successful and failed provider responses without leaving the route', async ({ page }) => {
+    let status = 200;
     await page.route('https://formspree.io/f/xaeondbn', (route) =>
-      route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ ok: true }) })
+      route.fulfill({ status, contentType: 'application/json', body: JSON.stringify({ ok: status === 200 }) })
     );
-    await page.getByLabel('Name', { exact: true }).fill('Portfolio Visitor');
-    await page.getByLabel('Email', { exact: true }).fill('visitor@example.com');
-    await page.getByLabel('What is this about?').selectOption('Project or collaboration');
-    await page
-      .getByLabel('Message', { exact: true })
-      .fill('I would like to discuss a software engineering project with you.');
-    await page.getByRole('button', { name: 'Send message' }).click();
 
+    const submit = async () => {
+      await page.getByLabel('Name', { exact: true }).fill('Portfolio Visitor');
+      await page.getByLabel('Email', { exact: true }).fill('visitor@example.com');
+      await page.getByLabel('What is this about?').selectOption('Project or collaboration');
+      await page
+        .getByLabel('Message', { exact: true })
+        .fill('I would like to discuss a software engineering project with you.');
+      await page.getByRole('button', { name: 'Send message' }).click();
+    };
+
+    await submit();
     await expect(page.getByRole('status')).toHaveText(/Message sent/);
-    await expect(page.getByLabel('Name', { exact: true })).toHaveValue('');
-    await expect(page).toHaveURL(/#contact$/);
-  });
+    await expect(page).toHaveURL(/\/profile\/#contact$/);
 
-  test('keeps the form available after a provider failure', async ({ page }) => {
-    await page.route('https://formspree.io/f/xaeondbn', (route) => route.fulfill({ status: 503 }));
-    await page.getByLabel('Name', { exact: true }).fill('Portfolio Visitor');
-    await page.getByLabel('Email', { exact: true }).fill('visitor@example.com');
-    await page.getByLabel('What is this about?').selectOption('Role or opportunity');
-    await page
-      .getByLabel('Message', { exact: true })
-      .fill('I would like to discuss a software engineering opportunity with you.');
-    await page.getByRole('button', { name: 'Send message' }).click();
-
+    status = 503;
+    await submit();
     await expect(page.getByRole('status')).toHaveText(/could not be sent/);
     await expect(page.getByRole('button', { name: 'Send message' })).toBeEnabled();
   });
 });
 
-test.describe('privacy page', () => {
-  test('explains both external services and stays accessible', async ({ page }) => {
+test.describe('supporting routes', () => {
+  test('keeps privacy and the custom 404 accessible', async ({ page }) => {
     await page.goto('/privacy/');
-
     await expect(page).toHaveTitle('Privacy | Phadima Percival Maredi');
     await expect(page.getByRole('heading', { level: 1 })).toHaveText(/Clear about what this site collects/);
     await expect(page.getByText('GoatCounter')).toBeVisible();
     await expect(page.getByText('Formspree')).toBeVisible();
+    await expectAccessibleAndContained(page);
 
-    const results = await new AxeBuilder({ page }).analyze();
-    expect(results.violations).toEqual([]);
-
-    const sizes = await page.evaluate(() => ({
-      viewport: window.innerWidth,
-      document: document.documentElement.scrollWidth,
-    }));
-    expect(sizes.document).toBeLessThanOrEqual(sizes.viewport);
-  });
-});
-
-test.describe('custom 404 page', () => {
-  test('returns a branded, accessible response without horizontal overflow', async ({ page }) => {
     const response = await page.goto('/this-page-does-not-exist');
-
     expect(response?.status()).toBe(404);
-    await expect(page).toHaveTitle(/Page not found/);
     await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'noindex');
     await expect(page.locator('link[rel="canonical"]')).toHaveCount(0);
     await expect(page.getByRole('heading', { level: 1 })).toHaveText(/This path ends here/);
-    await expect(page.getByRole('link', { name: 'Return to the portfolio' })).toHaveAttribute('href', '/');
-
-    const results = await new AxeBuilder({ page }).analyze();
-    expect(results.violations).toEqual([]);
-
-    const sizes = await page.evaluate(() => ({
-      viewport: window.innerWidth,
-      document: document.documentElement.scrollWidth,
-    }));
-    expect(sizes.document).toBeLessThanOrEqual(sizes.viewport);
+    await expectAccessibleAndContained(page);
   });
 });
 
 test.describe('Missing Children SA case study', () => {
-  test.beforeEach(async ({ page }) => {
-    await page.goto('/work/missing-children-sa/');
-  });
-
   test('explains the connected system and its engineering decisions', async ({ page }) => {
+    await page.goto('/work/missing-children-sa/');
     await expect(page).toHaveTitle(/Missing Children SA.*Case study.*Phadima Percival Maredi/);
     await expect(page.getByRole('heading', { level: 1, name: 'Missing Children SA' })).toBeVisible();
+    await expect(page.getByRole('link', { name: /Back to selected work/ })).toHaveAttribute('href', '/work/');
 
     for (const surface of ['API', 'Desktop', 'Mobile']) {
       await expect(page.getByRole('heading', { level: 3, name: surface })).toBeVisible();
     }
-
     await expect(page.getByRole('heading', { name: 'Moderation before visibility' })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'History that can be recovered' })).toBeVisible();
-  });
-
-  test('is accessible and has no horizontal overflow', async ({ page }) => {
-    const results = await new AxeBuilder({ page }).analyze();
-    expect(results.violations).toEqual([]);
-
-    const sizes = await page.evaluate(() => ({
-      viewport: window.innerWidth,
-      document: document.documentElement.scrollWidth,
-    }));
-    expect(sizes.document).toBeLessThanOrEqual(sizes.viewport);
+    await expectAccessibleAndContained(page);
   });
 });

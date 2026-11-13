@@ -1,0 +1,29 @@
+---
+import AppShell from '../../components/AppShell.astro';
+import ExperienceTimeline from '../../components/ExperienceTimeline.astro';
+import RouteHero from '../../components/RouteHero.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="Journey | Phadima Percival Maredi"
+  description="The software engineering journey of Phadima Percival Maredi across Capitec Bank, Amazon EC2, OLX, independent work, and teaching."
+>
+  <AppShell active="journey">
+    <main id="main" class="route-page journey-route">
+      <RouteHero
+        number="02"
+        eyebrow="Journey"
+        title="A career connected by the problems underneath it."
+        introduction="The roles changed, but the thread stayed consistent: follow a difficult problem across interfaces, services, data, delivery, and operations."
+      >
+        <div class="route-hero__facts" aria-label="Journey route summary">
+          <span>Product to infrastructure</span>
+          <span>2020 to present</span>
+          <span>Cape Town</span>
+        </div>
+      </RouteHero>
+      <ExperienceTimeline number="01" />
+    </main>
+  </AppShell>
+</BaseLayout>

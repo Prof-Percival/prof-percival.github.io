@@ -1,0 +1,46 @@
+---
+import { portfolioRoutes, type PortfolioRouteId } from '../data/navigation';
+import { site } from '../data/site';
+import ArrowIcon from './ArrowIcon.astro';
+import ThemeToggle from './ThemeToggle.astro';
+
+interface Props {
+  active?: PortfolioRouteId;
+}
+
+const { active } = Astro.props;
+---
+
+<aside class="site-rail" aria-label="Portfolio navigation">
+  <a class="rail-brand" href="/">
+    <span class="brand__mark" aria-hidden="true">
+      PM
+    </span>
+    <span class="rail-brand__copy">
+      <strong>
+        Phadima Percival
+        <br />
+        Maredi
+      </strong>
+      <small>Software Engineer</small>
+    </span>
+    <span class="sr-only">, portfolio home</span>
+  </a>
+
+  <nav class="rail-nav" aria-label="Portfolio routes">
+    {portfolioRoutes.map((route) => (
+      <a href={route.href} aria-current={active === route.id ? 'page' : undefined}>
+        <span>{route.number}</span>
+        <strong>{route.label}</strong>
+        <small>{route.description}</small>
+      </a>
+    ))}
+  </nav>
+
+  <div class="rail-actions">
+    <ThemeToggle />
+    <a href={site.links.resume} data-track="cv-rail">
+      View CV <ArrowIcon />
+    </a>
+  </div>
+</aside>

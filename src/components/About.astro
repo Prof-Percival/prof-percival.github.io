@@ -3,10 +3,21 @@ import { education } from '../data/portfolio';
 import ArrowIcon from './ArrowIcon.astro';
 import ProfileDetails from './ProfileDetails.astro';
 import SectionHeading from './SectionHeading.astro';
+
+interface Props {
+  number?: string;
+}
+
+const { number = '05' } = Astro.props;
 ---
 
 <section class="section about-section shell" id="about" aria-labelledby="about-title">
-  <SectionHeading number="05" eyebrow="About" id="about-title" title="An engineer who follows the problem through." />
+  <SectionHeading
+    number={number}
+    eyebrow="About"
+    id="about-title"
+    title="An engineer who follows the problem through."
+  />
 
   <div class="about-grid">
     <div class="about-copy">
