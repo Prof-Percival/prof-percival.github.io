@@ -1,0 +1,225 @@
+---
+import { defaultFraudScenario, evaluateFraudScenario } from '../data/fraud-demo';
+import ArrowIcon from './ArrowIcon.astro';
+
+const initial = evaluateFraudScenario(defaultFraudScenario);
+---
+
+<section class="case-interactive shell" aria-labelledby="fraud-evaluator-title">
+  <header class="case-interactive__header">
+    <div>
+      <p class="eyebrow">Synthetic evaluator</p>
+      <h2 id="fraud-evaluator-title">Change a transaction. Inspect every rule.</h2>
+    </div>
+    <p>This client-side demonstration stores nothing and never represents a real financial decision.</p>
+  </header>
+
+  <div class="demo-workspace fraud-demo" data-fraud-demo>
+    <form class="demo-controls" action="#fraud-results" data-fraud-form>
+      <div class="demo-field-grid">
+        <div class="form-field">
+          <label for="fraud-amount">Amount in ZAR</label>
+          <input
+            id="fraud-amount"
+            name="amount"
+            type="number"
+            min="0.01"
+            max="100000"
+            step="0.01"
+            value={defaultFraudScenario.amount}
+            required
+          />
+        </div>
+        <div class="form-field">
+          <label for="fraud-category">Category</label>
+          <select id="fraud-category" name="category" required>
+            <option value="Groceries">Groceries</option>
+            <option value="Gambling">Gambling</option>
+            <option value="Cryptocurrency">Cryptocurrency</option>
+            <option value="InternationalTransfer">International transfer</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label for="fraud-hour">Local hour</label>
+          <input
+            id="fraud-hour"
+            name="localHour"
+            type="number"
+            min="0"
+            max="23"
+            value={defaultFraudScenario.localHour}
+            required
+          />
+        </div>
+        <div class="form-field">
+          <label for="fraud-velocity">Transactions in 15 minutes</label>
+          <input
+            id="fraud-velocity"
+            name="transactionsInWindow"
+            type="number"
+            min="1"
+            max="20"
+            value={defaultFraudScenario.transactionsInWindow}
+            required
+          />
+        </div>
+        <div class="form-field">
+          <label for="fraud-speed">Implied travel speed in km/h</label>
+          <input
+            id="fraud-speed"
+            name="impliedTravelSpeed"
+            type="number"
+            min="0"
+            max="5000"
+            step="50"
+            value={defaultFraudScenario.impliedTravelSpeed}
+            required
+          />
+        </div>
+        <div class="form-field">
+          <label for="fraud-prior-count">Prior baseline transactions</label>
+          <input
+            id="fraud-prior-count"
+            name="priorTransactionCount"
+            type="number"
+            min="0"
+            max="100"
+            value={defaultFraudScenario.priorTransactionCount}
+            required
+          />
+        </div>
+        <div class="form-field">
+          <label for="fraud-average">Baseline average in ZAR</label>
+          <input
+            id="fraud-average"
+            name="averageAmount"
+            type="number"
+            min="0.01"
+            max="100000"
+            step="0.01"
+            value={defaultFraudScenario.averageAmount}
+            required
+          />
+        </div>
+      </div>
+      <div class="demo-checks">
+        <label>
+          <input name="deniedMerchant" type="checkbox" /> Merchant is on the deny list
+        </label>
+        <label>
+          <input name="firstTimeMerchant" type="checkbox" checked /> First transaction at this merchant
+        </label>
+      </div>
+      <div class="demo-actions">
+        <button class="button button--primary" type="submit">
+          Evaluate transaction <ArrowIcon direction="right" />
+        </button>
+        <button class="button button--secondary" type="reset">
+          Reset scenario
+        </button>
+      </div>
+      <p class="demo-note">Synthetic ruleset: portfolio-demo-1. All calculations stay in this page.</p>
+    </form>
+
+    <div class="demo-results" id="fraud-results">
+      <div class="fraud-result__summary">
+        <div
+          class="fraud-score"
+          role="meter"
+          aria-label="Synthetic risk score"
+          aria-valuemin="0"
+          aria-valuemax="100"
+          aria-valuenow={initial.score}
+          style={`--fraud-score: ${initial.score}`}
+          data-fraud-score-meter
+        >
+          <strong data-fraud-score>{initial.score}</strong>
+          <span>of 100</span>
+        </div>
+        <div class="fraud-decision" data-decision={initial.decision.toLowerCase()}>
+          <span>Decision</span>
+          <strong data-fraud-decision>{initial.decision}</strong>
+          <small>Review at 40. Decline at 75.</small>
+        </div>
+      </div>
+      <div class="fraud-outcomes" aria-label="Fraud rule outcomes">
+        {initial.outcomes.map((rule) => (
+          <article data-fraud-outcome={rule.id} data-triggered={String(rule.triggered)}>
+            <div>
+              <span data-fraud-rule-state>{rule.triggered ? `${rule.severity} / ${rule.points} points` : 'Clear'}</span>
+              <h3>{rule.label}</h3>
+            </div>
+            <p data-fraud-rule-reason>{rule.reason}</p>
+          </article>
+        ))}
+      </div>
+      <p class="form-status" role="status" aria-live="polite" aria-atomic="true" data-fraud-status>
+        Synthetic transaction evaluated. Score {initial.score}. Decision {initial.decision}.
+      </p>
+    </div>
+  </div>
+  <noscript>
+    <p class="case-deck__noscript">
+      Interactive controls need JavaScript. The default synthetic assessment remains visible.
+    </p>
+  </noscript>
+</section>
+
+<script>
+  import { evaluateFraudScenario, type FraudCategory, type FraudScenario } from '../data/fraud-demo';
+
+  document.querySelectorAll<HTMLElement>('[data-fraud-demo]').forEach((demo) => {
+    const form = demo.querySelector<HTMLFormElement>('[data-fraud-form]');
+    const score = demo.querySelector<HTMLElement>('[data-fraud-score]');
+    const meter = demo.querySelector<HTMLElement>('[data-fraud-score-meter]');
+    const decision = demo.querySelector<HTMLElement>('[data-fraud-decision]');
+    const decisionCard = demo.querySelector<HTMLElement>('.fraud-decision');
+    const status = demo.querySelector<HTMLElement>('[data-fraud-status]');
+    const outcomeCards = new Map<string, HTMLElement>();
+    demo.querySelectorAll<HTMLElement>('[data-fraud-outcome]').forEach((card) => {
+      if (card.dataset.fraudOutcome) outcomeCards.set(card.dataset.fraudOutcome, card);
+    });
+    if (!form || !score || !meter || !decision || !decisionCard || !status) return;
+
+    const readScenario = (): FraudScenario => {
+      const data = new FormData(form);
+      return {
+        amount: Number(data.get('amount')),
+        category: String(data.get('category')) as FraudCategory,
+        deniedMerchant: data.get('deniedMerchant') === 'on',
+        localHour: Number(data.get('localHour')),
+        transactionsInWindow: Number(data.get('transactionsInWindow')),
+        impliedTravelSpeed: Number(data.get('impliedTravelSpeed')),
+        firstTimeMerchant: data.get('firstTimeMerchant') === 'on',
+        priorTransactionCount: Number(data.get('priorTransactionCount')),
+        averageAmount: Number(data.get('averageAmount')),
+      };
+    };
+
+    const evaluate = () => {
+      if (!form.reportValidity()) return;
+      const result = evaluateFraudScenario(readScenario());
+      score.textContent = String(result.score);
+      meter.style.setProperty('--fraud-score', String(result.score));
+      meter.setAttribute('aria-valuenow', String(result.score));
+      decision.textContent = result.decision;
+      decisionCard.dataset.decision = result.decision.toLowerCase();
+      result.outcomes.forEach((rule) => {
+        const card = outcomeCards.get(rule.id);
+        if (!card) return;
+        card.dataset.triggered = String(rule.triggered);
+        const state = card.querySelector<HTMLElement>('[data-fraud-rule-state]');
+        const reason = card.querySelector<HTMLElement>('[data-fraud-rule-reason]');
+        if (state) state.textContent = rule.triggered ? `${rule.severity} / ${rule.points} points` : 'Clear';
+        if (reason) reason.textContent = rule.reason;
+      });
+      status.textContent = `Synthetic transaction evaluated. Score ${result.score}. Decision ${result.decision}.`;
+    };
+
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+      evaluate();
+    });
+    form.addEventListener('reset', () => window.setTimeout(evaluate, 0));
+  });
+</script>

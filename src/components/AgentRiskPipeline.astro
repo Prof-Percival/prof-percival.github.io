@@ -1,0 +1,202 @@
+---
+import { agentEventScenarios, simulateAgentEvent } from '../data/agent-demo';
+import ArrowIcon from './ArrowIcon.astro';
+
+const initial = simulateAgentEvent('ordinary', false);
+---
+
+<section class="case-interactive shell" aria-labelledby="agent-pipeline-title">
+  <header class="case-interactive__header">
+    <div>
+      <p class="eyebrow">Synthetic event pipeline</p>
+      <h2 id="agent-pipeline-title">Send an event. Trace what the monitor keeps.</h2>
+    </div>
+    <p>
+      The demonstration uses safe event labels only. It never executes a tool, opens a file, or makes a network request.
+    </p>
+  </header>
+
+  <div class="demo-workspace agent-demo" data-agent-demo>
+    <form class="demo-controls" action="#agent-results" data-agent-form>
+      <div class="form-field">
+        <label for="agent-scenario">Synthetic activity event</label>
+        <select id="agent-scenario" name="scenario" required>
+          {agentEventScenarios.map((scenario) => (
+            <option value={scenario.id}>{scenario.label}</option>
+          ))}
+        </select>
+      </div>
+      <div class="demo-checks">
+        <label>
+          <input name="replayed" type="checkbox" /> Send the same event twice
+        </label>
+      </div>
+      <div class="agent-demo__event">
+        <span>event_id</span>
+        <strong>evt-demo-104</strong>
+        <span>agent_id</span>
+        <strong>agent-demo-7</strong>
+        <span>type</span>
+        <strong data-agent-event-type>{initial.scenario.eventType}</strong>
+      </div>
+      <p class="demo-note" data-agent-summary>
+        {initial.scenario.summary}
+      </p>
+      <div class="demo-actions">
+        <button class="button button--primary" type="submit">
+          Run synthetic event <ArrowIcon direction="right" />
+        </button>
+        <button class="button button--secondary" type="reset">
+          Reset event
+        </button>
+      </div>
+    </form>
+
+    <div class="demo-results" id="agent-results">
+      <dl class="agent-demo__stats">
+        <div>
+          <dt>Received</dt>
+          <dd data-agent-received>{initial.received}</dd>
+        </div>
+        <div>
+          <dt>Stored</dt>
+          <dd data-agent-stored>{initial.stored}</dd>
+        </div>
+        <div>
+          <dt>Alerts</dt>
+          <dd data-agent-alert-count>{initial.alerts}</dd>
+        </div>
+      </dl>
+      <ol class="agent-pipeline" aria-label="Agent event processing stages">
+        {initial.stages.map((stage, index) => (
+          <li>
+            <button
+              type="button"
+              data-agent-stage
+              data-index={index}
+              data-state={stage.state}
+              aria-current={index === 0 ? 'step' : undefined}
+            >
+              <span>{String(index + 1).padStart(2, '0')}</span>
+              <strong>{stage.label}</strong>
+              <small data-agent-stage-state>{stage.state}</small>
+            </button>
+          </li>
+        ))}
+      </ol>
+      <article class="agent-stage-detail">
+        <p class="eyebrow">Selected stage</p>
+        <h3 data-agent-stage-title>{initial.stages[0]?.label}</h3>
+        <p data-agent-stage-detail>{initial.stages[0]?.detail}</p>
+      </article>
+      <article class="agent-alert" data-agent-alert hidden>
+        <div>
+          <span data-agent-alert-severity></span>
+          <strong data-agent-alert-rule></strong>
+        </div>
+        <h3 data-agent-alert-summary></h3>
+        <p>One synthetic alert is available through the same read boundary that serves summaries and timelines.</p>
+      </article>
+      <div class="agent-clear" data-agent-clear>
+        <span>Clear</span>
+        <strong>No alert raised for the ordinary synthetic event.</strong>
+      </div>
+      <p class="form-status" role="status" aria-live="polite" aria-atomic="true" data-agent-status>
+        Synthetic event stored and analysed. No alert was raised.
+      </p>
+    </div>
+  </div>
+  <noscript>
+    <p class="case-deck__noscript">
+      Interactive controls need JavaScript. The ordinary synthetic event remains visible.
+    </p>
+  </noscript>
+</section>
+
+<script>
+  import { simulateAgentEvent } from '../data/agent-demo';
+
+  document.querySelectorAll<HTMLElement>('[data-agent-demo]').forEach((demo) => {
+    const form = demo.querySelector<HTMLFormElement>('[data-agent-form]');
+    const eventType = demo.querySelector<HTMLElement>('[data-agent-event-type]');
+    const summary = demo.querySelector<HTMLElement>('[data-agent-summary]');
+    const received = demo.querySelector<HTMLElement>('[data-agent-received]');
+    const stored = demo.querySelector<HTMLElement>('[data-agent-stored]');
+    const alertCount = demo.querySelector<HTMLElement>('[data-agent-alert-count]');
+    const stageButtons = Array.from(demo.querySelectorAll<HTMLButtonElement>('[data-agent-stage]'));
+    const stageTitle = demo.querySelector<HTMLElement>('[data-agent-stage-title]');
+    const stageDetail = demo.querySelector<HTMLElement>('[data-agent-stage-detail]');
+    const alertCard = demo.querySelector<HTMLElement>('[data-agent-alert]');
+    const alertSeverity = demo.querySelector<HTMLElement>('[data-agent-alert-severity]');
+    const alertRule = demo.querySelector<HTMLElement>('[data-agent-alert-rule]');
+    const alertSummary = demo.querySelector<HTMLElement>('[data-agent-alert-summary]');
+    const clear = demo.querySelector<HTMLElement>('[data-agent-clear]');
+    const status = demo.querySelector<HTMLElement>('[data-agent-status]');
+    if (
+      !form ||
+      !eventType ||
+      !summary ||
+      !received ||
+      !stored ||
+      !alertCount ||
+      !stageTitle ||
+      !stageDetail ||
+      !alertCard ||
+      !alertSeverity ||
+      !alertRule ||
+      !alertSummary ||
+      !clear ||
+      !status
+    )
+      return;
+
+    let currentResult = simulateAgentEvent('ordinary', false);
+    const selectStage = (index: number) => {
+      const bounded = Math.min(currentResult.stages.length - 1, Math.max(0, index));
+      const stage = currentResult.stages[bounded]!;
+      stageButtons.forEach((button, buttonIndex) => {
+        if (buttonIndex === bounded) button.setAttribute('aria-current', 'step');
+        else button.removeAttribute('aria-current');
+      });
+      stageTitle.textContent = stage.label;
+      stageDetail.textContent = stage.detail;
+    };
+
+    const render = () => {
+      const data = new FormData(form);
+      currentResult = simulateAgentEvent(String(data.get('scenario')), data.get('replayed') === 'on');
+      eventType.textContent = currentResult.scenario.eventType;
+      summary.textContent = currentResult.scenario.summary;
+      received.textContent = String(currentResult.received);
+      stored.textContent = String(currentResult.stored);
+      alertCount.textContent = String(currentResult.alerts);
+      currentResult.stages.forEach((stage, index) => {
+        const button = stageButtons[index];
+        if (!button) return;
+        button.dataset.state = stage.state;
+        const state = button.querySelector<HTMLElement>('[data-agent-stage-state]');
+        if (state) state.textContent = stage.state;
+      });
+      if (currentResult.alert) {
+        alertCard.hidden = false;
+        clear.hidden = true;
+        alertSeverity.textContent = currentResult.alert.severity;
+        alertRule.textContent = currentResult.alert.rule;
+        alertSummary.textContent = currentResult.alert.summary;
+        status.textContent = `Synthetic event analysed. ${currentResult.alert.severity} alert raised by ${currentResult.alert.rule}.`;
+      } else {
+        alertCard.hidden = true;
+        clear.hidden = false;
+        status.textContent = 'Synthetic event stored and analysed. No alert was raised.';
+      }
+      selectStage(currentResult.alert ? 3 : 0);
+    };
+
+    stageButtons.forEach((button) => button.addEventListener('click', () => selectStage(Number(button.dataset.index))));
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+      if (form.reportValidity()) render();
+    });
+    form.addEventListener('reset', () => window.setTimeout(render, 0));
+  });
+</script>
