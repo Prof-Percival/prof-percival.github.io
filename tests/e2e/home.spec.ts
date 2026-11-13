@@ -557,8 +557,8 @@ test.describe('profile route', () => {
       await expect(page.getByRole('link', { name: new RegExp(credential) })).toBeVisible();
     }
     await expect(page.getByText('Eighteen shown from 114+ certifications listed on LinkedIn.')).toBeVisible();
-    await expect(page.getByRole('heading', { level: 4, name: 'Four documents you can inspect here.' })).toBeVisible();
-    await expect(page.getByRole('heading', { level: 4, name: 'Fourteen more signals of range.' })).toBeVisible();
+    await expect(page.getByRole('heading', { level: 4, name: 'Certificate previews' })).toBeVisible();
+    await expect(page.getByRole('heading', { level: 4, name: 'More certifications' })).toBeVisible();
     await expect(page.locator('[data-certification-card]')).toHaveCount(18);
     await expect(page.locator('.certificate-feature-card')).toHaveCount(4);
     await expect(page.locator('.credential-grid > a')).toHaveCount(14);
