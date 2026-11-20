@@ -795,6 +795,28 @@ test.describe('contact form', () => {
     await expect(page.getByRole('link', { name: 'Privacy details' })).toHaveAttribute('href', '/privacy/');
   });
 
+  test('aligns paired controls when one field has helper text', async ({ page, isMobile }) => {
+    test.skip(isMobile, 'Paired fields use a stacked layout on mobile.');
+
+    const company = await page.getByLabel(/Company/).boundingBox();
+    const subject = await page.getByLabel('What is this about?').boundingBox();
+
+    expect(company).not.toBeNull();
+    expect(subject).not.toBeNull();
+    expect(Math.abs(company!.y - subject!.y)).toBeLessThanOrEqual(1);
+  });
+
+  test('shows the review note only for CV requests', async ({ page }) => {
+    const subject = page.getByLabel('What is this about?');
+    const reviewNote = page.locator('[data-cv-review-note]');
+
+    await expect(reviewNote).toBeHidden();
+    await subject.selectOption('CV request');
+    await expect(reviewNote).toBeVisible();
+    await subject.selectOption('Project or collaboration');
+    await expect(reviewNote).toBeHidden();
+  });
+
   test('prepares a manually reviewed CV request from portfolio links', async ({ page }) => {
     await page.goto('/profile/?subject=cv-request#contact');
 

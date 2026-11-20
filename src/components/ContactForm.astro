@@ -126,7 +126,7 @@ const { number = '06' } = Astro.props;
         </small>
       </div>
 
-      <p class="contact-form__review-note">
+      <p class="contact-form__review-note" data-cv-review-note hidden>
         I review CV requests manually and send the document only after checking the opportunity and requester.
       </p>
 
@@ -154,6 +154,7 @@ const { number = '06' } = Astro.props;
     const subject = form.querySelector<HTMLSelectElement>('select[name="subject"]');
     const cvRequiredFields = Array.from(form.querySelectorAll<HTMLInputElement>('[data-cv-required]'));
     const cvRequirementMessages = Array.from(form.querySelectorAll<HTMLElement>('[data-cv-requirement]'));
+    const cvReviewNote = form.querySelector<HTMLElement>('[data-cv-review-note]');
     const cvRequestValue = 'CV request';
 
     const updateCvRequirements = () => {
@@ -164,6 +165,7 @@ const { number = '06' } = Astro.props;
       cvRequirementMessages.forEach((message) => {
         message.textContent = isCvRequest ? 'Required for CV requests.' : 'Optional unless this is a CV request.';
       });
+      if (cvReviewNote) cvReviewNote.hidden = !isCvRequest;
     };
 
     if (subject && new URLSearchParams(window.location.search).get('subject') === 'cv-request') {
