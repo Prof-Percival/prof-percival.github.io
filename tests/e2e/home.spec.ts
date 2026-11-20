@@ -787,9 +787,21 @@ test.describe('contact form', () => {
     );
     await expect(page.getByLabel('Name', { exact: true })).toBeVisible();
     await expect(page.getByLabel('Email', { exact: true })).toBeVisible();
+    await expect(page.getByLabel(/Company/)).toBeVisible();
+    await expect(page.getByLabel(/Role or job posting URL/)).toBeVisible();
     await expect(page.getByLabel('What is this about?')).toBeVisible();
+    await expect(page.getByLabel('What is this about?').locator('option[value="CV request"]')).toHaveCount(1);
     await expect(page.getByLabel('Message', { exact: true })).toBeVisible();
     await expect(page.getByRole('link', { name: 'Privacy details' })).toHaveAttribute('href', '/privacy/');
+  });
+
+  test('prepares a manually reviewed CV request from portfolio links', async ({ page }) => {
+    await page.goto('/profile/?subject=cv-request#contact');
+
+    await expect(page.getByLabel('What is this about?')).toHaveValue('CV request');
+    await expect(page.getByLabel(/Company/)).toHaveAttribute('required', '');
+    await expect(page.getByLabel(/Role or job posting URL/)).toHaveAttribute('required', '');
+    await expect(page.getByText(/review CV requests manually/i)).toBeVisible();
   });
 
   test('uses native validation before making a submission', async ({ page }) => {

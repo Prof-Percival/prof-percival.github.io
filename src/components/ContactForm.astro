@@ -16,7 +16,7 @@ const { number = '06' } = Astro.props;
     eyebrow="Contact"
     id="contact-title"
     title="Good systems start with a clear conversation."
-    introduction="Have a role, project, or difficult software problem in mind? Send enough context to make the first reply useful."
+    introduction="Have a role, project, or difficult software problem in mind? Send enough context to make the first reply useful. CV requests for specific opportunities are welcome."
   />
 
   <div class="contact-grid">
@@ -67,21 +67,47 @@ const { number = '06' } = Astro.props;
 
       <div class="form-row">
         <div class="form-field">
-          <label for="contact-company">
-            Company <span>Optional</span>
-          </label>
-          <input id="contact-company" name="company" type="text" autocomplete="organization" maxlength="120" />
+          <label for="contact-company">Company</label>
+          <input
+            id="contact-company"
+            name="company"
+            type="text"
+            autocomplete="organization"
+            maxlength="120"
+            aria-describedby="contact-company-help"
+            data-cv-required
+          />
+          <small id="contact-company-help" data-cv-requirement>
+            Optional unless this is a CV request.
+          </small>
         </div>
         <div class="form-field">
           <label for="contact-subject">What is this about?</label>
           <select id="contact-subject" name="subject" required>
             <option value="">Choose one</option>
             <option value="Role or opportunity">Role or opportunity</option>
+            <option value="CV request">CV request</option>
             <option value="Project or collaboration">Project or collaboration</option>
             <option value="Speaking or mentoring">Speaking or mentoring</option>
             <option value="Other">Something else</option>
           </select>
         </div>
+      </div>
+
+      <div class="form-field">
+        <label for="contact-role-url">Role or job posting URL</label>
+        <input
+          id="contact-role-url"
+          name="role_url"
+          type="url"
+          autocomplete="url"
+          maxlength="500"
+          aria-describedby="contact-role-url-help"
+          data-cv-required
+        />
+        <small id="contact-role-url-help" data-cv-requirement>
+          Optional unless this is a CV request.
+        </small>
       </div>
 
       <div class="form-field">
@@ -99,6 +125,10 @@ const { number = '06' } = Astro.props;
           20 to 4,000 characters. Do not include passwords or sensitive information.
         </small>
       </div>
+
+      <p class="contact-form__review-note">
+        I review CV requests manually and send the document only after checking the opportunity and requester.
+      </p>
 
       <div class="contact-form__footer">
         <p>
@@ -121,6 +151,26 @@ const { number = '06' } = Astro.props;
     const submit = form.querySelector<HTMLButtonElement>('[data-submit]');
     const label = form.querySelector<HTMLElement>('[data-submit-label]');
     const status = form.querySelector<HTMLElement>('[data-form-status]');
+    const subject = form.querySelector<HTMLSelectElement>('select[name="subject"]');
+    const cvRequiredFields = Array.from(form.querySelectorAll<HTMLInputElement>('[data-cv-required]'));
+    const cvRequirementMessages = Array.from(form.querySelectorAll<HTMLElement>('[data-cv-requirement]'));
+    const cvRequestValue = 'CV request';
+
+    const updateCvRequirements = () => {
+      const isCvRequest = subject?.value === cvRequestValue;
+      cvRequiredFields.forEach((field) => {
+        field.required = isCvRequest;
+      });
+      cvRequirementMessages.forEach((message) => {
+        message.textContent = isCvRequest ? 'Required for CV requests.' : 'Optional unless this is a CV request.';
+      });
+    };
+
+    if (subject && new URLSearchParams(window.location.search).get('subject') === 'cv-request') {
+      subject.value = cvRequestValue;
+    }
+    updateCvRequirements();
+    subject?.addEventListener('change', updateCvRequirements);
 
     form.addEventListener('submit', async (event) => {
       if (!form.reportValidity()) return;
@@ -146,6 +196,7 @@ const { number = '06' } = Astro.props;
         if (!response.ok) throw new Error('Submission failed');
 
         form.reset();
+        updateCvRequirements();
         status.dataset.state = 'success';
         status.textContent = 'Message sent. Thank you. I will reply as soon as I can.';
         document.dispatchEvent(new CustomEvent('portfolio:track', { detail: { path: 'contact-submit' } }));

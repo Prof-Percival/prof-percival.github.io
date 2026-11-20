@@ -27,17 +27,9 @@ npm run test:e2e
 npm audit --omit=dev --audit-level=high
 ```
 
-## Updating content
-
-- Edit identity, links, the current role, and the Formspree endpoint in `src/data/site.ts`.
-- Edit experience, projects, capabilities, education, credentials, languages, and community work in `src/data/portfolio.ts`.
-- Route document requests through the contact form.
-- Keep claims traceable to a public profile, CV, credential, or inspected project source. Do not add private employer or customer material.
-- Run the full verification commands above before publishing.
-
 ## Contact and analytics
 
-The contact form posts to the dedicated Formspree endpoint in `src/data/site.ts`. Browser tests mock provider responses and must never send a real message.
+The contact form posts to the dedicated Formspree endpoint in `src/data/site.ts`. It handles general messages and manually reviewed CV requests. Browser tests mock provider responses and must never send a real message.
 
 GoatCounter receives its public count endpoint from the `PUBLIC_GOATCOUNTER_ENDPOINT` GitHub Actions repository variable during the Pages build. Copy `.env.example` to `.env` only when testing a build locally, and use an endpoint in this form:
 

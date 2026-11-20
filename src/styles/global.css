@@ -2473,6 +2473,14 @@
     box-shadow: 0 0 0 3px var(--signal-soft);
   }
 
+  .contact-form__review-note {
+    padding: 0.9rem 1rem;
+    border-left: 2px solid var(--signal);
+    background: var(--signal-soft);
+    color: var(--muted-strong);
+    font-size: 0.72rem;
+  }
+
   .contact-form__footer {
     display: flex;
     align-items: center;

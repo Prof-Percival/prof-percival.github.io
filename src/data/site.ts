@@ -12,9 +12,9 @@ export const site = {
   links: {
     github: 'https://github.com/Prof-Percival',
     linkedin: 'https://za.linkedin.com/in/prof-percival',
-    resume: '/profile/?subject=cv-request#contact',
   },
   contact: {
     formspreeEndpoint: 'https://formspree.io/f/xaeondbn',
+    cvRequestUrl: '/profile/?subject=cv-request#contact',
   },
 } as const;

@@ -50,6 +50,15 @@ test.describe('release integrity', () => {
     }
   });
 
+  test('does not link downloadable PDF documents', async ({ page, isMobile }) => {
+    test.skip(isMobile, 'One browser pass covers public document exposure.');
+
+    for (const route of publishedRoutes) {
+      await page.goto(route);
+      await expect(page.locator('a[href$=".pdf" i]')).toHaveCount(0);
+    }
+  });
+
   test('opens external destinations and documents without replacing the portfolio', async ({ page, isMobile }) => {
     test.skip(isMobile, 'One browser pass covers shared link behavior.');
     const violations: string[] = [];
